@@ -192,7 +192,7 @@ export default function MyApp() {
                         Welcome to Eco Wheels Dublin
                     </Typography>
                     <Typography variant="h5" sx={{ mt: 2, color: '#2E3B4E', mb: 4 }}>
-                        Rent your eco-friendly car today!ccx
+                        Rent your eco-friendly car today!
                     </Typography>
                     <Box
                         sx={{
