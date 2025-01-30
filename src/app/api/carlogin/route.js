@@ -16,7 +16,7 @@ export async function POST(req) {
         console.log("Received password:", password);
 
         // Connect to MongoDB
-        const uri = 'mongodb+srv://Femi:password12345@krispykreme.zpsyu.mongodb.net/app';
+        const uri = 'mongodb+srv://Femi:password_123@ecowheelsdublin.zpsyu.mongodb.net/?retryWrites=true&w=majority&appName=EcoWheelsDublin/app';
         const client = new MongoClient(uri);
         const dbName = 'carrental';
         await client.connect();
