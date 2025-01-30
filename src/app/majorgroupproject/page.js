@@ -189,7 +189,7 @@ export default function MyApp() {
                     }}
                 >
                     <Typography variant="h3" sx={{ color: '#2E3B4E', fontWeight: 'bold', mb: 2 }}>
-                        Welcome to Eco Wheels Dublin
+                        Welcome to Eco Wheels Dublins
                     </Typography>
                     <Typography variant="h5" sx={{ mt: 2, color: '#2E3B4E', mb: 4 }}>
                         Rent your eco-friendly car today!
