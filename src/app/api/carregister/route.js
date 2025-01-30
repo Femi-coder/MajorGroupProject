@@ -21,7 +21,7 @@ export async function POST(req) {
         }
 
         // MongoDB connection
-        const uri = 'mongodb+srv://Femi:password_123@ecowheelsdublin.zpsyu.mongodb.net/?retryWrites=true&w=majority&appName=EcoWheelsDublin';
+        const uri = 'mongodb+srv://Femi:password_123@ecowheelsdublin.zpsyu.mongodb.net';
         const client = new MongoClient(uri);
         const dbName = 'carrental'; // database name
 
