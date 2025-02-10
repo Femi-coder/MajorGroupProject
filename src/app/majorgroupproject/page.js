@@ -283,6 +283,7 @@ export default function MyApp() {
                                 }
                             }}
                         >
+                            Explore Rental Options
                         </Button>
                     </Box>
                 </Box>
