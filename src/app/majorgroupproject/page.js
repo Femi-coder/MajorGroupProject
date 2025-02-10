@@ -98,6 +98,13 @@ export default function MyApp() {
             })
             .catch((err) => console.error('Error during login:', err));
     };
+    const handleLogout = () => {
+        setLoggedIn(false);
+        setUsername('');
+        alert('You have been logged out.');
+        runShowFirst();  // Redirect to the home page after logout
+    };
+    
 
     const handleRegister = () => {
         const name = document.querySelector('input[name="name"]').value;
@@ -148,20 +155,29 @@ export default function MyApp() {
                 }}
             >
                 <Toolbar>
-                    <Typography variant="h4" component="div" sx={{ flexGrow: 1, color: '#2E3B4E', fontWeight: 'bold' }}>
-                        Eco Wheels Dublin
-                    </Typography>
-                    <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowFirst}>
-                        Home
-                    </Button>
-                    <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowRegister}>
-                        Register
-                    </Button>
-                    <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowLogin}>
-                        Login
-                    </Button>
-                    <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowStudentShare}>
-                        Student Share
+                <Typography variant="h4" component="div" sx={{ flexGrow: 1, color: '#2E3B4E', fontWeight: 'bold' }}>
+            Eco Wheels Dublin
+        </Typography>
+        <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowFirst}>
+            Home
+        </Button>
+        {!loggedIn && (
+            <>
+                <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowRegister}>
+                    Register
+                </Button>
+                <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowLogin}>
+                    Login
+                </Button>
+            </>
+        )}
+        {loggedIn && (
+            <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={handleLogout}>
+                Logout
+            </Button>
+        )}
+        <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowStudentShare}>
+            Student Share
                     </Button>
                     <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowMapApi}>
                         Map API
