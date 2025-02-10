@@ -21,6 +21,7 @@ export default function MyApp() {
     const [showReviews, setShowReviews] = useState(false);
     const [showRent, setShowRent] = useState(false);
     const [showContact, setShowContact] = useState(false);
+    const [username, setUsername] = useState('');
 
     const resetPages = () => {
         setShowFirstPage(false);
@@ -91,6 +92,7 @@ export default function MyApp() {
                 } else {
                     alert('Login successful!');
                     setLoggedIn(true);
+                    setUsername(data.username);
                     runShowFirst(); // Redirect to the home page after login
                 }
             })
@@ -189,8 +191,13 @@ export default function MyApp() {
                     }}
                 >
                     <Typography variant="h3" sx={{ color: '#2E3B4E', fontWeight: 'bold', mb: 2 }}>
-                        Welcome to Eco Wheels Dublin
+                        Welcome to Eco Wheels Dublin 
                     </Typography>
+                    {loggedIn && (
+            <Typography variant="h5" sx={{ mt: 1, color: '#2E3B4E' }}>
+                Hello, {username}!
+            </Typography>
+        )}
                     <Typography variant="h5" sx={{ mt: 2, color: '#2E3B4E', mb: 4 }}>
                         Rent your eco-friendly car todays!
                     </Typography>
