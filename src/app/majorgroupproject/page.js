@@ -212,7 +212,7 @@ export default function MyApp() {
                             }}
                         >
                             <img
-                                src="https://teslarentals.ae/wp-content/uploads/2024/06/car-rental-electric-cars.jpg"
+                                src="https://changinglanes.ie/wp-content/uploads/2024/01/BYD-SEAL-1-scaled.jpg"
                                 alt="Electric Car 1"
                                 style={{ width: '100%', height: 'auto' }}
                             />
