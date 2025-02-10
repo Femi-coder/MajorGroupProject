@@ -274,9 +274,15 @@ export default function MyApp() {
                                     backgroundColor: '#4C5E72',
                                 },
                             }}
-                            onClick={runShowRent}
+                            onClick={() => {
+                                if (loggedIn) {
+                                    runShowRent();
+                                } else {
+                                    alert('Please log in to explore rental options.');
+                                    runShowLogin(); 
+                                }
+                            }}
                         >
-                            Explore Rental Options
                         </Button>
                     </Box>
                 </Box>
