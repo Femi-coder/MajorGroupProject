@@ -24,6 +24,8 @@ export default function MyApp() {
     const [username, setUsername] = useState('');
     const [userEmail, setUserEmail] = useState('');
     const [studentShareRegistered, setStudentShareRegistered] = useState(false);
+    const [studentShareDetails, setStudentShareDetails] = useState(null);
+
 
 
     const resetPages = () => {
@@ -96,8 +98,8 @@ export default function MyApp() {
                     alert('Login successful!');
                     setLoggedIn(true);
                     setUserEmail(email);
-                    setUsername(data.username);
-                    setStudentShareRegistered(data.studentShareRegistered);
+                    setUsername(data.username || 'User'); // Ensure username exists
+                    setStudentShareRegistered(data.studentShareRegistered || false);
                     runShowFirst();
                 }
             })
@@ -107,8 +109,37 @@ export default function MyApp() {
         setLoggedIn(false);
         setUsername('');
         setUserEmail('');
+        setStudentShareRegistered(false);
+        setStudentShareDetails(null);
         alert('You have been logged out.');
         runShowFirst();
+    };
+    const handleShowStudentShare = () => {
+        resetPages(); // Reset other pages before displaying Student Share
+    
+        if (loggedIn) {
+            fetch('/api/getStudentShareDetails', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: userEmail }),
+            })
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.error) {
+                    setStudentShareRegistered(false);
+                    setStudentShareDetails(null);
+                } else {
+                    setStudentShareRegistered(true);
+                    setStudentShareDetails(data); // Store student details
+                }
+                setShowStudentShare(true);
+            })
+            .catch((err) => console.error('Error fetching Student Share details:', err));
+        } else {
+            setShowStudentShare(true); // If not logged in, still allow viewing the page
+        }
     };
     
     
@@ -128,7 +159,7 @@ export default function MyApp() {
             },
             body: JSON.stringify({
                 name: username,
-                email: userEmail,  
+                email: userEmail,
                 studentID,
                 drivingLicense,
             }),
@@ -140,6 +171,7 @@ export default function MyApp() {
             } else {
                 alert('You have successfully registered for Student Share!');
                 setStudentShareRegistered(true);
+                setStudentShareDetails({ studentID, drivingLicense }); // ✅ Immediately update the state
             }
         })
         .catch((err) => console.error('Error during Student Share registration:', err));
@@ -216,7 +248,7 @@ export default function MyApp() {
                 Logout
             </Button>
         )}
-        <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowStudentShare}>
+        <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={handleShowStudentShare}>
             Student Share
                     </Button>
                     <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowMapApi}>
@@ -351,7 +383,7 @@ export default function MyApp() {
                             backgroundColor: '#4C5E72',
                         },
                     }}
-                    onClick={runShowStudentShare} // Navigate to Student Share section
+                    onClick={handleShowStudentShare} // Navigate to Student Share section
                 >
                     Join Student Share
                 </Button>
@@ -454,12 +486,23 @@ export default function MyApp() {
 
 {showStudentShare && (
     <Box sx={{ p: 4, textAlign: 'center', backgroundColor: 'white', borderRadius: '10px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-        {/* Greeting the User */}
         <Typography variant="h4" sx={{ color: '#2E3B4E', fontWeight: 'bold', mb: 2 }}>
             Hello, {username}!
         </Typography>
 
-        {!studentShareRegistered ? (
+        {studentShareRegistered && studentShareDetails ? (
+            <>
+                <Typography variant="h3" sx={{ color: '#2E3B4E', fontWeight: 'bold', mb: 2 }}>
+                    Student Share Details
+                </Typography>
+                <Typography sx={{ color: '#2E3B4E' }}>
+                    <strong>Student ID:</strong> {studentShareDetails.studentID}
+                </Typography>
+                <Typography sx={{ color: '#2E3B4E' }}>
+                    <strong>Driving License:</strong> {studentShareDetails.drivingLicense}
+                </Typography>
+            </>
+        ) : (
             <>
                 <Typography variant="h3" sx={{ color: '#2E3B4E', fontWeight: 'bold' }}>
                     Student Share Registration
@@ -476,10 +519,6 @@ export default function MyApp() {
                     <FormLabel>Driving License Number</FormLabel>
                     <Input name="drivingLicense" type="text" placeholder="Enter your License Number" required />
                 </FormControl>
-                <FormControl sx={{ mt: 2, mb: 2 }}>
-                    <FormLabel>Car Model </FormLabel>
-                    <Input name="carmodel" type="text" placeholder="Enter your Car Model" required />
-                </FormControl>
                 <Button
                     variant="contained"
                     sx={{
@@ -494,15 +533,6 @@ export default function MyApp() {
                 >
                     Register for Student Share
                 </Button>
-            </>
-        ) : (
-            <>
-                <Typography variant="h3" sx={{ color: '#2E3B4E', fontWeight: 'bold', mb: 2 }}>
-                    Welcome to Student Share!
-                </Typography>
-                <Typography sx={{ color: '#2E3B4E' }}>
-                    You can now share and rent cars with other students.
-                </Typography>
             </>
         )}
 
@@ -524,6 +554,7 @@ export default function MyApp() {
         </Box>
     </Box>
 )}
+
 
 
 
