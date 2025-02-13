@@ -211,7 +211,7 @@ export default function MyApp() {
                     </Typography>
                     {loggedIn && (
             <Typography variant="h5" sx={{ mt: 1, color: '#2E3B4E' }}>
-                Hello, {username}! and have a good day
+                Hello, {username}!
             </Typography>
         )}
                     <Typography variant="h5" sx={{ mt: 2, color: '#2E3B4E', mb: 4 }}>
