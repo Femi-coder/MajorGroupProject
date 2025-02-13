@@ -97,6 +97,7 @@ export default function MyApp() {
                     setLoggedIn(true);
                     setUserEmail(email);
                     setUsername(data.username);
+                    setStudentShareRegistered(data.studentShareRegistered);
                     runShowFirst();
                 }
             })
@@ -467,7 +468,6 @@ export default function MyApp() {
                     Please register for Student Share before accessing shared cars.
                 </Typography>
 
-                {/* Registration Form */}
                 <FormControl sx={{ mt: 2, mb: 2 }}>
                     <FormLabel>Student ID</FormLabel>
                     <Input name="studentID" type="text" placeholder="Enter your Student ID" required />
@@ -475,6 +475,10 @@ export default function MyApp() {
                 <FormControl sx={{ mt: 2, mb: 2 }}>
                     <FormLabel>Driving License Number</FormLabel>
                     <Input name="drivingLicense" type="text" placeholder="Enter your License Number" required />
+                </FormControl>
+                <FormControl sx={{ mt: 2, mb: 2 }}>
+                    <FormLabel>Car Model </FormLabel>
+                    <Input name="carmodel" type="text" placeholder="Enter your Car Model" required />
                 </FormControl>
                 <Button
                     variant="contained"
@@ -513,13 +517,14 @@ export default function MyApp() {
                         backgroundColor: '#4C5E72',
                     },
                 }}
-                onClick={runShowFirst} // Navigate back to Home Page
+                onClick={runShowFirst}
             >
                 Back to Home
             </Button>
         </Box>
     </Box>
 )}
+
 
 
             {showMapApi && (

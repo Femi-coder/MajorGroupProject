@@ -1,48 +1,28 @@
- import { MongoClient } from 'mongodb';
-
 export async function POST(req) {
-    try {
-        // Parse incoming data
-        const body = await req.json();
-        const { email, password } = body;
+    const { email, password } = await req.json();
+    const uri = 'mongodb+srv://Femi:password_123@ecowheelsdublin.zpsyu.mongodb.net';
+    const client = new MongoClient(uri);
+    const dbName = 'carrental';
 
-        // Validate input
-        if (!email || !password) {
-            console.error("Validation failed: Email or password is missing");
-            return new Response(JSON.stringify({ error: "Email and password are required" }), { status: 400 });
-        }
+    await client.connect();
+    const db = client.db(dbName);
+    const usersCollection = db.collection('users');
+    const studentShareCollection = db.collection('studentShareUsers');
 
-        console.log("Received email:", email);
-        console.log("Received password:", password);
-
-        // Connect to MongoDB
-        const uri = 'mongodb+srv://Femi:password_123@ecowheelsdublin.zpsyu.mongodb.net';
-        const client = new MongoClient(uri);
-        const dbName = 'carrental';
-        await client.connect();
-
-        console.log('Connected successfully to MongoDB');
-
-        const db = client.db(dbName);
-        const usersCollection = db.collection('carusers');
-
-        // Find user in database
-        const user = await usersCollection.findOne({ email });
-        if (!user) {
-            console.error("User not found for email:", email);
-            return new Response(JSON.stringify({ error: "User not found" }), { status: 404 });
-        }
-
-        // Validate password
-        if (user.password !== password) {
-            console.error("Password mismatch for email:", email);
-            return new Response(JSON.stringify({ error: "Invalid credentials" }), { status: 401 });
-        }
-
-        // Respond with success
-        return new Response(JSON.stringify({ message: "Login successful", username: user.name }), { status: 200 });
-    } catch (error) {
-        console.error("Error in POST handler:", error);
-        return new Response(JSON.stringify({ error: "Internal server error" }), { status: 500 });
+    // Check if user exists
+    const user = await usersCollection.findOne({ email, password });
+    if (!user) {
+        return new Response(JSON.stringify({ error: "Invalid email or password" }), { status: 400 });
     }
+
+    // Check if the user is registered for Student Share
+    const studentShare = await studentShareCollection.findOne({ email });
+    const studentShareRegistered = studentShare ? true : false;
+
+    return new Response(JSON.stringify({
+        message: "Login successful!",
+        username: user.name,
+        email: user.email,
+        studentShareRegistered: studentShareRegistered // ✅ Return registration status
+    }), { status: 200 });
 }
