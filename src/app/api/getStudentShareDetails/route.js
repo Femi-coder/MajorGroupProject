@@ -26,7 +26,6 @@ export async function POST(req) {
         return new Response(JSON.stringify({
             studentID: student.studentID,
             drivingLicense: student.drivingLicense,
-            carModel: student.carModel,
             registeredAt: student.registeredAt
         }), { status: 200 });
 

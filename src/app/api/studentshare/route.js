@@ -1,11 +1,12 @@
+import { MongoClient } from 'mongodb';
 export async function POST(req) {
     console.log("In the Student Share registration API");
 
     try {
         const body = await req.json();
-        const { name, email, studentID, drivingLicense, carModel } = body;
+        const { name, email, studentID, drivingLicense} = body;
 
-        if (!name || !email || !studentID || !drivingLicense || !carModel) {
+        if (!name || !email || !studentID || !drivingLicense ) {
             console.log("Validation failed: Missing required fields");
             return new Response(JSON.stringify({ error: "All fields are required" }), { status: 400 });
         }
@@ -21,21 +22,19 @@ export async function POST(req) {
         const db = client.db(dbName);
         const studentShareCollection = db.collection('studentShareUsers');
 
-        // Check if the student is already registered
+        // Checks if the student is already registered
         const existingStudent = await studentShareCollection.findOne({ email });
         if (existingStudent) {
             console.log("Validation failed: Student already registered");
             return new Response(JSON.stringify({ error: "You are already registered for Student Share" }), { status: 400 });
         }
 
-        // Save student data to the database
         const newStudent = {
             name,
             email,
             studentID,
             drivingLicense,
-            carModel,
-            studentShareRegistered: true, // ✅ Mark the student as registered
+            studentShareRegistered: true,
             registeredAt: new Date()
         };
 
