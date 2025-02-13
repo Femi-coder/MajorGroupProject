@@ -21,6 +21,7 @@ export default function MyApp() {
     const [showReviews, setShowReviews] = useState(false);
     const [showRent, setShowRent] = useState(false);
     const [showContact, setShowContact] = useState(false);
+    const [username, setUsername] = useState('');
 
     const resetPages = () => {
         setShowFirstPage(false);
@@ -91,11 +92,19 @@ export default function MyApp() {
                 } else {
                     alert('Login successful!');
                     setLoggedIn(true);
+                    setUsername(data.username);
                     runShowFirst(); // Redirect to the home page after login
                 }
             })
             .catch((err) => console.error('Error during login:', err));
     };
+    const handleLogout = () => {
+        setLoggedIn(false);
+        setUsername('');
+        alert('You have been logged out.');
+        runShowFirst();  // Redirect to the home page after logout
+    };
+    
 
     const handleRegister = () => {
         const name = document.querySelector('input[name="name"]').value;
@@ -146,20 +155,29 @@ export default function MyApp() {
                 }}
             >
                 <Toolbar>
-                    <Typography variant="h4" component="div" sx={{ flexGrow: 1, color: '#2E3B4E', fontWeight: 'bold' }}>
-                        Eco Wheels Dublin
-                    </Typography>
-                    <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowFirst}>
-                        Home
-                    </Button>
-                    <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowRegister}>
-                        Register
-                    </Button>
-                    <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowLogin}>
-                        Login
-                    </Button>
-                    <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowStudentShare}>
-                        Student Share
+                <Typography variant="h4" component="div" sx={{ flexGrow: 1, color: '#2E3B4E', fontWeight: 'bold' }}>
+            Eco Wheels Dublin
+        </Typography>
+        <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowFirst}>
+            Home
+        </Button>
+        {!loggedIn && (
+            <>
+                <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowRegister}>
+                    Register
+                </Button>
+                <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowLogin}>
+                    Login
+                </Button>
+            </>
+        )}
+        {loggedIn && (
+            <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={handleLogout}>
+                Logout
+            </Button>
+        )}
+        <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowStudentShare}>
+            Student Share
                     </Button>
                     <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowMapApi}>
                         Map API
@@ -189,8 +207,13 @@ export default function MyApp() {
                     }}
                 >
                     <Typography variant="h3" sx={{ color: '#2E3B4E', fontWeight: 'bold', mb: 2 }}>
-                        Welcome to Eco Wheels Dublin
+                        Welcome to Eco Wheels Dublin 
                     </Typography>
+                    {loggedIn && (
+            <Typography variant="h5" sx={{ mt: 1, color: '#2E3B4E' }}>
+                Hello, {username}!
+            </Typography>
+        )}
                     <Typography variant="h5" sx={{ mt: 2, color: '#2E3B4E', mb: 4 }}>
                         Rent your eco-friendly car todays!
                     </Typography>
@@ -212,7 +235,7 @@ export default function MyApp() {
                             }}
                         >
                             <img
-                                src="https://teslarentals.ae/wp-content/uploads/2024/06/car-rental-electric-cars.jpg"
+                                src="https://changinglanes.ie/wp-content/uploads/2024/01/BYD-SEAL-1-scaled.jpg"
                                 alt="Electric Car 1"
                                 style={{ width: '100%', height: 'auto' }}
                             />
@@ -267,7 +290,14 @@ export default function MyApp() {
                                     backgroundColor: '#4C5E72',
                                 },
                             }}
-                            onClick={runShowRent}
+                            onClick={() => {
+                                if (loggedIn) {
+                                    runShowRent();
+                                } else {
+                                    alert('Please log in to explore rental options.');
+                                    runShowLogin(); 
+                                }
+                            }}
                         >
                             Explore Rental Options
                         </Button>
