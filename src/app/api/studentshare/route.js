@@ -6,10 +6,12 @@ export async function POST(req) {
     try {
         // Parse the incoming request data
         const body = await req.json();
-        const { name, email, studentID, drivingLicense } = body;
+        const { studentID, drivingLicense } = body;
+       
+    
 
         // Validate input fields
-        if (!name || !email || !studentID || !drivingLicense) {
+        if ( !studentID || !drivingLicense) {
             console.log("Validation failed: Missing required fields");
             return new Response(JSON.stringify({ error: "All fields are required" }), { status: 400 });
         }
@@ -34,8 +36,6 @@ export async function POST(req) {
 
         // Save student data to the database
         const newStudent = {
-            name,
-            email,
             studentID,
             drivingLicense,
             registeredAt: new Date() // Timestamp of registration

@@ -22,6 +22,9 @@ export default function MyApp() {
     const [showRent, setShowRent] = useState(false);
     const [showContact, setShowContact] = useState(false);
     const [username, setUsername] = useState('');
+    const [userEmail, setUserEmail] = useState('');
+    const [studentShareRegistered, setStudentShareRegistered] = useState(false);
+
 
     const resetPages = () => {
         setShowFirstPage(false);
@@ -92,8 +95,9 @@ export default function MyApp() {
                 } else {
                     alert('Login successful!');
                     setLoggedIn(true);
+                    setUserEmail(email);
                     setUsername(data.username);
-                    runShowFirst(); // Redirect to the home page after login
+                    runShowFirst();
                 }
             })
             .catch((err) => console.error('Error during login:', err));
@@ -101,8 +105,43 @@ export default function MyApp() {
     const handleLogout = () => {
         setLoggedIn(false);
         setUsername('');
+        setUserEmail('');
         alert('You have been logged out.');
-        runShowFirst();  // Redirect to the home page after logout
+        runShowFirst();
+    };
+    
+    
+    const handleStudentShareRegister = () => {
+        const studentID = document.querySelector('input[name="studentID"]').value;
+        const drivingLicense = document.querySelector('input[name="drivingLicense"]').value;
+    
+        if (!studentID || !drivingLicense) {
+            alert("Please enter both Student ID and Driving License Number.");
+            return;
+        }
+    
+        fetch('/api/studentshare', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: username,
+                email: userEmail,  
+                studentID,
+                drivingLicense,
+            }),
+        })
+        .then((res) => res.json())
+        .then((data) => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                alert('You have successfully registered for Student Share!');
+                setStudentShareRegistered(true);
+            }
+        })
+        .catch((err) => console.error('Error during Student Share registration:', err));
     };
     
 
@@ -195,115 +234,132 @@ export default function MyApp() {
             </AppBar>
 
             {showFirstPage && (
-                <Box
-                    sx={{
-                        p: 4,
-                        textAlign: 'center',
-                        border: '1px dashed grey',
-                        margin: '20px',
-                        backgroundColor: 'white',
-                        borderRadius: '10px',
-                        boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                    }}
-                >
-                    <Typography variant="h3" sx={{ color: '#2E3B4E', fontWeight: 'bold', mb: 2 }}>
-                        Welcome to Eco Wheels Dublin 
-                    </Typography>
-                    {loggedIn && (
+    <Box
+        sx={{
+            p: 4,
+            textAlign: 'center',
+            border: '1px dashed grey',
+            margin: '20px',
+            backgroundColor: 'white',
+            borderRadius: '10px',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+        }}
+    >
+        <Typography variant="h3" sx={{ color: '#2E3B4E', fontWeight: 'bold', mb: 2 }}>
+            Welcome to Eco Wheels Dublin 
+        </Typography>
+        {loggedIn && (
             <Typography variant="h5" sx={{ mt: 1, color: '#2E3B4E' }}>
                 Hello, {username}!
             </Typography>
         )}
-                    <Typography variant="h5" sx={{ mt: 2, color: '#2E3B4E', mb: 4 }}>
-                        Rent your eco-friendly car today!
-                    </Typography>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flexWrap: 'wrap',
-                            justifyContent: 'center',
-                            gap: 2,
-                        }}
-                    >
-                        <Box
-                            sx={{
-                                width: '300px',
-                                backgroundColor: '#f5f5f5',
-                                borderRadius: '10px',
-                                overflow: 'hidden',
-                                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                            }}
-                        >
-                            <img
-                                src="https://changinglanes.ie/wp-content/uploads/2024/01/BYD-SEAL-1-scaled.jpg"
-                                alt="Electric Car 1"
-                                style={{ width: '100%', height: 'auto' }}
-                            />
-                            <Typography sx={{ p: 2, fontWeight: 'bold', color: '#2E3B4E' }}>
-                                Affordable Rentals
-                            </Typography>
-                        </Box>
-                        <Box
-                            sx={{
-                                width: '300px',
-                                backgroundColor: '#f5f5f5',
-                                borderRadius: '10px',
-                                overflow: 'hidden',
-                                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                            }}
-                        >
-                            <img
-                                src="https://c.ndtvimg.com/2021-11/1316no38_mg-zs-ev_625x300_26_November_21.jpg"
-                                alt="Electric Car 2"
-                                style={{ width: '100%', height: 'auto' }}
-                            />
-                            <Typography sx={{ p: 2, fontWeight: 'bold', color: '#2E3B4E' }}>
-                                Eco-Friendly Fleet
-                            </Typography>
-                        </Box>
-                        <Box
-                            sx={{
-                                width: '300px',
-                                backgroundColor: '#f5f5f5',
-                                borderRadius: '10px',
-                                overflow: 'hidden',
-                                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                            }}
-                        >
-                            <img
-                                src="https://car-images.bauersecure.com/wp-images/2697/kia_ev6_best_electric_cars_2024.jpg"
-                                alt="Electric Car 3"
-                                style={{ width: '100%', height: 'auto' }}
-                            />
-                            <Typography sx={{ p: 2, fontWeight: 'bold', color: '#2E3B4E' }}>
-                                Convenient Locations
-                            </Typography>
-                        </Box>
-                    </Box>
-                    <Box sx={{ mt: 4 }}>
-                        <Button
-                            variant="contained"
-                            sx={{
-                                backgroundColor: '#2E3B4E',
-                                color: 'white',
-                                ':hover': {
-                                    backgroundColor: '#4C5E72',
-                                },
-                            }}
-                            onClick={() => {
-                                if (loggedIn) {
-                                    runShowRent();
-                                } else {
-                                    alert('Please log in to explore rental options.');
-                                    runShowLogin(); 
-                                }
-                            }}
-                        >
-                            Explore Rental Options
-                        </Button>
-                    </Box>
-                </Box>
-            )}
+        <Typography variant="h5" sx={{ mt: 2, color: '#2E3B4E', mb: 4 }}>
+            Rent your eco-friendly car today!
+        </Typography>
+
+        {/* Car Listings */}
+        <Box
+            sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+                gap: 2,
+            }}
+        >
+            <Box
+                sx={{
+                    width: '300px',
+                    backgroundColor: '#f5f5f5',
+                    borderRadius: '10px',
+                    overflow: 'hidden',
+                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                }}
+            >
+                <img
+                    src="https://changinglanes.ie/wp-content/uploads/2024/01/BYD-SEAL-1-scaled.jpg"
+                    alt="Electric Car 1"
+                    style={{ width: '100%', height: 'auto' }}
+                />
+                <Typography sx={{ p: 2, fontWeight: 'bold', color: '#2E3B4E' }}>
+                    Affordable Rentals
+                </Typography>
+            </Box>
+
+            <Box
+                sx={{
+                    width: '300px',
+                    backgroundColor: '#f5f5f5',
+                    borderRadius: '10px',
+                    overflow: 'hidden',
+                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                }}
+            >
+                <img
+                    src="https://c.ndtvimg.com/2021-11/1316no38_mg-zs-ev_625x300_26_November_21.jpg"
+                    alt="Electric Car 2"
+                    style={{ width: '100%', height: 'auto' }}
+                />
+                <Typography sx={{ p: 2, fontWeight: 'bold', color: '#2E3B4E' }}>
+                    Eco-Friendly Fleet
+                </Typography>
+            </Box>
+
+            <Box
+                sx={{
+                    width: '300px',
+                    backgroundColor: '#f5f5f5',
+                    borderRadius: '10px',
+                    overflow: 'hidden',
+                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                }}
+            >
+                <img
+                    src="https://car-images.bauersecure.com/wp-images/2697/kia_ev6_best_electric_cars_2024.jpg"
+                    alt="Electric Car 3"
+                    style={{ width: '100%', height: 'auto' }}
+                />
+                <Typography sx={{ p: 2, fontWeight: 'bold', color: '#2E3B4E' }}>
+                    Convenient Locations
+                </Typography>
+            </Box>
+        </Box>
+
+        {/* Buttons for Explore Rental Options & Student Share (Side by Side) */}
+        {loggedIn && (
+            <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center', gap: 2 }}>
+                <Button
+                    variant="contained"
+                    sx={{
+                        backgroundColor: '#2E3B4E',
+                        color: 'white',
+                        ':hover': {
+                            backgroundColor: '#4C5E72',
+                        },
+                    }}
+                    onClick={runShowRent} // Navigate to Rental Options
+                >
+                    Explore Rental Options
+                </Button>
+
+                <Button
+                    variant="contained"
+                    sx={{
+                        backgroundColor: '#2E3B4E',
+                        color: 'white',
+                        ':hover': {
+                            backgroundColor: '#4C5E72',
+                        },
+                    }}
+                    onClick={runShowStudentShare} // Navigate to Student Share section
+                >
+                    Join Student Share
+                </Button>
+            </Box>
+        )}
+    </Box>
+)}
+
+
 
             {showRegister && (
                 <Box
@@ -395,12 +451,76 @@ export default function MyApp() {
                 </Box>
             )}
 
-            {showStudentShare && (
-                <Box sx={{ p: 4, textAlign: 'center', backgroundColor: 'white', borderRadius: '10px' }}>
-                    <Typography variant="h3">Student Share</Typography>
-                    <Typography>Welcome to Student Share</Typography>
-                </Box>
-            )}
+{showStudentShare && (
+    <Box sx={{ p: 4, textAlign: 'center', backgroundColor: 'white', borderRadius: '10px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+        {/* Greeting the User */}
+        <Typography variant="h4" sx={{ color: '#2E3B4E', fontWeight: 'bold', mb: 2 }}>
+            Hello, {username}!
+        </Typography>
+
+        {!studentShareRegistered ? (
+            <>
+                <Typography variant="h3" sx={{ color: '#2E3B4E', fontWeight: 'bold' }}>
+                    Student Share Registration
+                </Typography>
+                <Typography sx={{ color: '#2E3B4E', mb: 2 }}>
+                    Please register for Student Share before accessing shared cars.
+                </Typography>
+
+                {/* Registration Form */}
+                <FormControl sx={{ mt: 2, mb: 2 }}>
+                    <FormLabel>Student ID</FormLabel>
+                    <Input name="studentID" type="text" placeholder="Enter your Student ID" required />
+                </FormControl>
+                <FormControl sx={{ mt: 2, mb: 2 }}>
+                    <FormLabel>Driving License Number</FormLabel>
+                    <Input name="drivingLicense" type="text" placeholder="Enter your License Number" required />
+                </FormControl>
+                <Button
+                    variant="contained"
+                    sx={{
+                        mt: 3,
+                        backgroundColor: '#2E3B4E',
+                        color: 'white',
+                        ':hover': {
+                            backgroundColor: '#4C5E72',
+                        },
+                    }}
+                    onClick={handleStudentShareRegister}
+                >
+                    Register for Student Share
+                </Button>
+            </>
+        ) : (
+            <>
+                <Typography variant="h3" sx={{ color: '#2E3B4E', fontWeight: 'bold', mb: 2 }}>
+                    Welcome to Student Share!
+                </Typography>
+                <Typography sx={{ color: '#2E3B4E' }}>
+                    You can now share and rent cars with other students.
+                </Typography>
+            </>
+        )}
+
+        {/* Back to Home Button */}
+        <Box sx={{ mt: 4 }}>
+            <Button
+                variant="contained"
+                sx={{
+                    backgroundColor: '#2E3B4E',
+                    color: 'white',
+                    ':hover': {
+                        backgroundColor: '#4C5E72',
+                    },
+                }}
+                onClick={runShowFirst} // Navigate back to Home Page
+            >
+                Back to Home
+            </Button>
+        </Box>
+    </Box>
+)}
+
 
             {showMapApi && (
                 <Box sx={{ p: 4, textAlign: 'center', backgroundColor: 'white', borderRadius: '10px' }}>
