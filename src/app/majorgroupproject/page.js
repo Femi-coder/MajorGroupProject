@@ -22,6 +22,7 @@ export default function MyApp() {
     const [showRent, setShowRent] = useState(false);
     const [showContact, setShowContact] = useState(false);
     const [username, setUsername] = useState('');
+    const [studentShareRegistered, setStudentShareRegistered] = useState(false);
 
     const resetPages = () => {
         setShowFirstPage(false);
@@ -50,10 +51,23 @@ export default function MyApp() {
     };
 
     const runShowStudentShare = () => {
+        if (!loggedIn) {
+            alert('Please log in to access Student Share.');
+            resetPages();
+            setShowLogin(true);
+            return;
+        }
+    
         resetPages();
         setShowStudentShare(true);
+    
+        // If user is not registered for Student Share, show the registration form first
+        if (!studentShareRegistered) {
+            setShowRegister(true);
+        } else {
+            setShowStudentShare(true);
+        }
     };
-
     const runShowMapApi = () => {
         resetPages();
         setShowMapApi(true);
@@ -93,44 +107,78 @@ export default function MyApp() {
                     alert('Login successful!');
                     setLoggedIn(true);
                     setUsername(data.username);
-                    runShowFirst(); // Redirect to the home page after login
-                }
-            })
-            .catch((err) => console.error('Error during login:', err));
-    };
+                    
+                    // Check if user is registered for Student Share
+                    fetch(`/api/studentshare?email=${data.username}`)
+                    .then((res) => res.json())
+                    .then((studentShareData) => {
+                        if (studentShareData.registered) {
+                            setStudentShareRegistered(true);
+                        } else {
+                            setStudentShareRegistered(false);
+                        }
+                    })
+                    .catch((err) => console.error('Error checking Student Share registration:', err));
+
+                resetPages();
+                setShowStudentShare(true);
+            }
+        })
+        .catch((err) => console.error('Error during login:', err));
+};
     const handleLogout = () => {
         setLoggedIn(false);
         setUsername('');
         alert('You have been logged out.');
         runShowFirst();  // Redirect to the home page after logout
     };
+    const handleStudentShareRegister = () => {
+        const studentID = document.querySelector('input[name="studentID"]').value;
+        const drivingLicense = document.querySelector('input[name="drivingLicense"]').value;
     
-
-    const handleRegister = () => {
-        const name = document.querySelector('input[name="name"]').value;
-        const address = document.querySelector('input[name="address"]').value;
-        const email = document.querySelector('input[name="email"]').value;
-        const password = document.querySelector('input[name="password"]').value;
-        const confirmPassword = document.querySelector('input[name="confirm-password"]').value;
-
-        fetch('/api/carregister', {
+        if (!username || !loggedIn) {
+            alert("You must be logged in to register for Student Share.");
+            return;
+        }
+    
+        if (!studentID || !drivingLicense) {
+            alert("Please enter both Student ID and Driving License Number.");
+            return;
+        }
+    
+        fetch('/api/studentshare', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ name, address, email, password, confirmPassword }),
+            body: JSON.stringify({ name: username, email: username, studentID, drivingLicense }),
         })
-            .then((res) => res.json())
+            .then((res) => {
+                if (!res.ok) {
+                    throw new Error(`Server error: ${res.status}`);
+                }
+                return res.text(); // Read response as text to handle empty responses
+            })
+            .then((text) => {
+                if (!text) {
+                    throw new Error("Empty response from the server.");
+                }
+                return JSON.parse(text);
+            })
             .then((data) => {
                 if (data.error) {
                     alert(data.error);
                 } else {
-                    alert('Registration successful!');
-                    runShowLogin(); // Redirect to login page after registration
+                    alert('You have successfully registered for Student Share!');
+                    setStudentShareRegistered(true);
+    
+                    resetPages();
+                    setShowStudentShare(true);
                 }
             })
-            .catch((err) => console.error('Error during registration:', err));
+            .catch((err) => console.error('Error during Student Share registration:', err));
     };
+    
 
     return (
         <Box
@@ -395,12 +443,57 @@ export default function MyApp() {
                 </Box>
             )}
 
-            {showStudentShare && (
-                <Box sx={{ p: 4, textAlign: 'center', backgroundColor: 'white', borderRadius: '10px' }}>
-                    <Typography variant="h3">Student Share</Typography>
-                    <Typography>Page under construction</Typography>
-                </Box>
-            )}
+{showStudentShare && (
+    <Box
+        sx={{
+            p: 4,
+            textAlign: 'center',
+            backgroundColor: 'white',
+            borderRadius: '10px',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+            minHeight: '500px' // Ensure it takes up space
+        }}
+    >
+        {!studentShareRegistered ? (
+            <>
+                <Typography variant="h3" sx={{ color: '#2E3B4E', fontWeight: 'bold' }}>
+                    Student Share Registration
+                </Typography>
+                <Typography sx={{ color: '#2E3B4E', mb: 2 }}>
+                    Please register for Student Share before accessing shared cars.
+                </Typography>
+                
+                <FormControl sx={{ mt: 2, mb: 2 }}>
+                    <FormLabel>Student ID</FormLabel>
+                    <Input name="studentID" type="text" placeholder="Enter your Student ID" required />
+                </FormControl>
+                <FormControl sx={{ mt: 2, mb: 2 }}>
+                    <FormLabel>Driving License Number</FormLabel>
+                    <Input name="drivingLicense" type="text" placeholder="Enter your License Number" required />
+                </FormControl>
+                <Button
+                    variant="contained"
+                    sx={{
+                        mt: 3,
+                        backgroundColor: '#2E3B4E',
+                        color: 'white',
+                        ':hover': {
+                            backgroundColor: '#4C5E72',
+                        },
+                    }}
+                    onClick={handleStudentShareRegister}
+                >
+                    Register for Student Share
+                </Button>
+            </>
+        ) : (
+            <>
+                <Typography variant="h3">Student Share</Typography>
+                <Typography>Welcome to Student Share! You can now share and rent cars.</Typography>
+            </>
+        )}
+    </Box>
+)}
 
             {showMapApi && (
                 <Box sx={{ p: 4, textAlign: 'center', backgroundColor: 'white', borderRadius: '10px' }}>
