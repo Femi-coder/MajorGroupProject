@@ -98,7 +98,7 @@ export default function MyApp() {
                     alert('Login successful!');
                     setLoggedIn(true);
                     setUserEmail(email);
-                    setUsername(data.username || 'User'); // Ensure username exists
+                    setUsername(data.username || 'User');
                     setStudentShareRegistered(data.studentShareRegistered || false);
                     runShowFirst();
                 }
@@ -572,12 +572,172 @@ export default function MyApp() {
                 </Box>
             )}
 
-            {showRent && (
-                <Box sx={{ p: 4, textAlign: 'center', backgroundColor: 'white', borderRadius: '10px' }}>
-                    <Typography variant="h3">Rent</Typography>
-                    <Typography>Page under construction</Typography>
+{showRent && (
+    <Box
+        sx={{
+            p: 4,
+            textAlign: 'center',
+            backgroundColor: 'white',
+            borderRadius: '10px',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+            maxWidth: '80%',
+            margin: 'auto',
+        }}
+    >
+        {/* Rent Page Header */}
+        <Typography variant="h3" sx={{ fontWeight: 'bold', mb: 3, color: '#2E3B4E' }}>
+            Find Your Perfect Rental Car 🚗
+        </Typography>
+        <Typography variant="body1" sx={{ mb: 4, color: '#555' }}>
+            Choose from a variety of eco-friendly vehicles to fit your needs.  
+            Flexible pickup & drop-off locations available.
+        </Typography>
+
+        {/* Search & Filter Section */}
+        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 4, flexWrap: 'wrap' }}>
+            <Input type="text" placeholder="Enter location..." sx={{ width: '220px' }} />
+            <Input type="date" placeholder="Pickup Date" sx={{ width: '180px' }} />
+            <Input type="date" placeholder="Return Date" sx={{ width: '180px' }} />
+            <Button
+                variant="contained"
+                sx={{
+                    backgroundColor: '#2E3B4E',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    p: 1.5,
+                    borderRadius: '5px',
+                }}
+            >
+                🔍 Search Cars
+            </Button>
+        </Box>
+
+        {/* Car Listings */}
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 3 }}>
+            <Box
+                sx={{
+                    width: '300px',
+                    backgroundColor: '#f5f5f5',
+                    borderRadius: '10px',
+                    overflow: 'hidden',
+                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                    textAlign: 'left',
+                }}
+            >
+                <img
+                    src="https://source.unsplash.com/400x300/?tesla,car"
+                    alt="Tesla Model 3"
+                    style={{ width: '100%', height: 'auto' }}
+                />
+                <Box sx={{ p: 2 }}>
+                    <Typography sx={{ fontWeight: 'bold', fontSize: '18px', color: '#2E3B4E' }}>
+                        Tesla Model 3
+                    </Typography>
+                    <Typography sx={{ fontSize: '14px', color: '#555' }}>
+                        Automatic | Electric | 5 Seats
+                    </Typography>
+                    <Typography sx={{ fontWeight: 'bold', fontSize: '20px', color: '#28a745', mt: 1 }}>
+                        €50/day
+                    </Typography>
+                    <Button
+                        variant="contained"
+                        sx={{
+                            backgroundColor: '#2E3B4E',
+                            color: 'white',
+                            width: '100%',
+                            mt: 2,
+                            fontWeight: 'bold',
+                        }}
+                    >
+                        Reserve Now 🚗
+                    </Button>
                 </Box>
-            )}
+            </Box>
+
+            
+            <Box
+                sx={{
+                    width: '300px',
+                    backgroundColor: '#f5f5f5',
+                    borderRadius: '10px',
+                    overflow: 'hidden',
+                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                    textAlign: 'left',
+                }}
+            >
+                <img
+                    src="https://source.unsplash.com/400x300/?toyota,car"
+                    alt="Toyota Corolla Hybrid"
+                    style={{ width: '100%', height: 'auto' }}
+                />
+                <Box sx={{ p: 2 }}>
+                    <Typography sx={{ fontWeight: 'bold', fontSize: '18px', color: '#2E3B4E' }}>
+                        Toyota Corolla Hybrid
+                    </Typography>
+                    <Typography sx={{ fontSize: '14px', color: '#555' }}>
+                        Automatic | Hybrid | 5 Seats
+                    </Typography>
+                    <Typography sx={{ fontWeight: 'bold', fontSize: '20px', color: '#28a745', mt: 1 }}>
+                        €40/day
+                    </Typography>
+                    <Button
+                        variant="contained"
+                        sx={{
+                            backgroundColor: '#2E3B4E',
+                            color: 'white',
+                            width: '100%',
+                            mt: 2,
+                            fontWeight: 'bold',
+                        }}
+                    >
+                        Reserve Now
+                    </Button>
+                </Box>
+            </Box>
+
+            {}
+            <Box
+                sx={{
+                    width: '300px',
+                    backgroundColor: '#f5f5f5',
+                    borderRadius: '10px',
+                    overflow: 'hidden',
+                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                    textAlign: 'left',
+                }}
+            >
+                <img
+                    src="https://source.unsplash.com/400x300/?kia,car"
+                    alt="Kia EV6"
+                    style={{ width: '100%', height: 'auto' }}
+                />
+                <Box sx={{ p: 2 }}>
+                    <Typography sx={{ fontWeight: 'bold', fontSize: '18px', color: '#2E3B4E' }}>
+                        Kia EV6
+                    </Typography>
+                    <Typography sx={{ fontSize: '14px', color: '#555' }}>
+                        Automatic | Electric | 5 Seats
+                    </Typography>
+                    <Typography sx={{ fontWeight: 'bold', fontSize: '20px', color: '#28a745', mt: 1 }}>
+                        €55/day
+                    </Typography>
+                    <Button
+                        variant="contained"
+                        sx={{
+                            backgroundColor: '#2E3B4E',
+                            color: 'white',
+                            width: '100%',
+                            mt: 2,
+                            fontWeight: 'bold',
+                        }}
+                    >
+                        Reserve Now 
+                    </Button>
+                </Box>
+            </Box>
+        </Box>
+    </Box>
+)}
 
             {showContact && (
                 <Box sx={{ p: 4, textAlign: 'center', backgroundColor: 'white', borderRadius: '10px' }}>
