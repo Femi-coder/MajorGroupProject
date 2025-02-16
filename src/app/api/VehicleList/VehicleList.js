@@ -29,11 +29,11 @@ const VehicleList = () => {
         { id: 14, make: "BMW", model: "i7", year: 2025, price: 300, image: "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTW1BwByfkYB_X9S_nd2Kj5cfSAdcIF7pP2XIZKgjm54o1BrgOl" },
         { id: 15, make: "Hyundai", model: "Kona Electric", year: 2021, price: 85, image: "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTVKMncBMTerwaf81SAGIBdsW4Xz1ZCiyoCZfzs0z7DQ5-zEBmh" },
         { id: 16, make: "Skoda", model: "Enyaq", year: 2024, price: 160, image: "https://www.beev.co/wp-content/uploads/2024/02/skoda-enyaq-coupe-85.png" },
-        { id: 17, make: "BMW", model: "i4", year: 2022, price: 195, image: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTWHD-Mk5QG1j6_Cx8EKYhBH6o468cy_FgB5y_EdpbvYBAghh4n" },
-        { id: 18, make: "BMW", model: "i4", year: 2022, price: 195, image: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTWHD-Mk5QG1j6_Cx8EKYhBH6o468cy_FgB5y_EdpbvYBAghh4n" },
-        { id: 19, make: "BMW", model: "i4", year: 2022, price: 195, image: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTWHD-Mk5QG1j6_Cx8EKYhBH6o468cy_FgB5y_EdpbvYBAghh4n" },
-        { id: 20, make: "BMW", model: "i4", year: 2022, price: 195, image: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTWHD-Mk5QG1j6_Cx8EKYhBH6o468cy_FgB5y_EdpbvYBAghh4n" },
-        { id: 21, make: "BMW", model: "i4", year: 2022, price: 195, image: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTWHD-Mk5QG1j6_Cx8EKYhBH6o468cy_FgB5y_EdpbvYBAghh4n" },
+        { id: 17, make: "Hyundai", model: "IONIQ 5 N", year: 2022, price: 270, image: "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcTV9FiJyLPTOSgaYxw8v7CXYrmD2fUaVkwZ3QeqtoaECQLXp2uW" },
+        { id: 18, make: "Kia", model: "EV6", year: 2024, price: 130, image: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSITu36VCdwZDswpaGq4YS86Ee_om4eRPUf6f5QvlxYKzZ47n7g" },
+        { id: 19, make: "Kia", model: "EV9", year: 2025, price: 225, image: "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcSypRXfJPg0RQkT7Ms0ySqqocZ4ZeNIkO4qx-FHmMK7whTA7uMK" },
+        { id: 20, make: "Porsche", model: "Taycan", year: 2020, price: 165, image: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSLYdqQNQTs9S75EAZ_dewjddp5-UXzXj6nTB3xn3rmX6KREf_G" },
+        { id: 21, make: "Porsche", model: "Macan", year: 2025, price: 299, image: "https://images.dealer.com/ddc/vehicles/2025/Porsche/Macan%20Electric/SUV/color/Volcano%20Grey%20Metallic-2H-42,42,41-640-en_US.jpg" },
       ];
       setVehicles(data);
       setFilteredVehicles(data);
