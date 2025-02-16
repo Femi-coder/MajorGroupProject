@@ -40,6 +40,7 @@ const VehicleList = () => {
 
   return (
     <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Vehicle List</h1>
       <div className="flex gap-4 mb-4">
         <Input 
           placeholder="Search by make or model" 
@@ -67,4 +68,10 @@ const VehicleList = () => {
   );
 };
 
-export default VehicleList;
+export default function Home() {
+  return (
+    <div>
+      <VehicleList />
+    </div>
+  );
+}
