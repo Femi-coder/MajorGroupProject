@@ -643,7 +643,7 @@ export default function MyApp() {
             {showContact && (
                 <Box sx={{ p: 4, textAlign: 'center', backgroundColor: 'white', borderRadius: '10px' }}>
                     <Typography variant="h3">Contact</Typography>
-                    <Typography>Page under construction</Typography>
+                    <Typography>Page is under construction</Typography>
                 </Box>
             )}
         </Box>
