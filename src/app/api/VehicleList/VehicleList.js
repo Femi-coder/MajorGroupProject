@@ -54,7 +54,7 @@ const VehicleList = () => {
         <Select value={sort} onChange={(e) => setSort(e.target.value)} sx={{ width: "200px", backgroundColor: "white" }}>
           <MenuItem value="price">Sort by Price</MenuItem>
           <MenuItem value="year">Sort by Year</MenuItem>
-          <MenuItem value="name">Sort by Name</MenuItem>
+          <MenuItem value="name">Sort by Make</MenuItem>
         </Select>
       </Box>
       <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 4 }}>
