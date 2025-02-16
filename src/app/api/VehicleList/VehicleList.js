@@ -14,11 +14,11 @@ const VehicleList = () => {
     // Fetch vehicle data (Replace with actual API call)
     const fetchVehicles = async () => {
       const data = [
-        { id: 1, make: "Toyota", model: "Camry", year: 2022, price: 50 },
-        { id: 2, make: "Honda", model: "Civic", year: 2021, price: 45 },
-        { id: 3, make: "Ford", model: "Focus", year: 2020, price: 40 },
+        { id: 1, make: "BWM", model: "i7", year: 2025, price: 150 },
+        { id: 2, make: "Audi", model: "Q6 e-Tron", year: 2022, price: 145 },
+        { id: 3, make: "BYD", model: "Dolphin", year: 2022, price: 40 },
         { id: 4, make: "Tesla", model: "Model 3", year: 2023, price: 70 },
-        { id: 5, make: "BMW", model: "X5", year: 2022, price: 80 },
+        { id: 5, make: "BMW", model: "i4", year: 2022, price: 80 },
       ];
       setVehicles(data);
       setFilteredVehicles(data);
