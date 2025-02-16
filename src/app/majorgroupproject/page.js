@@ -631,7 +631,7 @@ export default function MyApp() {
                     mt: 3,
                 }}
             >
-                Confirm Booking
+                Confirm Your Booking
             </Button>
         </Box>
     </Box>
