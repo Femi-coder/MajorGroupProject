@@ -265,23 +265,24 @@ export default function MyApp() {
             </Button>
         )}
         <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={handleShowStudentShare}>
-            Student Share
-                    </Button>
-                    <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowMapApi}>
-                        Map API
-                    </Button>
-                    <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowReviews}>
-                        Reviews
-                    </Button>
-                    <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowRent}>
-                        Rent
-                    </Button>
-                    <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowContact}>
-        <Button color="inherit" sx={{ fontWeight: "bold" }} onClick={runShowVehicles}>
-            Vehicles
-        </Button>
-                        Contact
-                    </Button>
+    Student Share
+</Button>
+<Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowMapApi}>
+    Map API
+</Button>
+<Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowReviews}>
+    Reviews
+</Button>
+<Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowRent}>
+    Rent
+</Button>
+<Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowContact}>
+    Contact
+</Button>
+<Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowVehicles}>
+    Vehicles
+</Button>
+
                 </Toolbar>
             </AppBar>
 
