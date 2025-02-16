@@ -20,6 +20,7 @@ const VehicleList = () => {
         { id: 5, make: "Tesla", model: "Model Y", year: 2020, price: 80, image: "https://images.hgmsites.net/lrg/2022-tesla-model-y-performance-awd-angular-front-exterior-view_100833533_l.jpg" },
         { id: 6, make: "Audi", model: "Q6 E-Tron", year: 2025, price: 175, image: "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQJQ94kMS27fDB0AHLvy60P-CPRpIeb524xYwCbwqRz6yhCZgE-" },
         { id: 7, make: "BMW", model: "iX", year: 2024, price: 205, image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTugWhgSDy76DrH3wNjyvyweDBRXCYk3VnvtEWpIFHcgIMG-URA" },
+        { id: 8, make: "BMW", model: "i4", year: 2022, price: 195, image: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTWHD-Mk5QG1j6_Cx8EKYhBH6o468cy_FgB5y_EdpbvYBAghh4n" },
       ];
       setVehicles(data);
       setFilteredVehicles(data);
