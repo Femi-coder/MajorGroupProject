@@ -12,6 +12,7 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 
 import { useState } from 'react';
+import VehicleList from '../components/VehicleList';
 
 export default function MyApp() {
     const [loggedIn, setLoggedIn] = useState(false);
@@ -23,6 +24,7 @@ export default function MyApp() {
     const [showReviews, setShowReviews] = useState(false);
     const [showRent, setShowRent] = useState(false);
     const [showContact, setShowContact] = useState(false);
+    const [showVehicles, setShowVehicles] = useState(false);
     const [username, setUsername] = useState('');
     const [userEmail, setUserEmail] = useState('');
     const [studentShareRegistered, setStudentShareRegistered] = useState(false);
@@ -31,6 +33,11 @@ export default function MyApp() {
 
 
     const resetPages = () => {
+    const runShowVehicles = () => {
+        resetPages();
+        setShowVehicles(true);
+    };
+
         setShowFirstPage(false);
         setShowRegister(false);
         setShowLogin(false);
@@ -263,6 +270,9 @@ export default function MyApp() {
                         Rent
                     </Button>
                     <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowContact}>
+        <Button color="inherit" sx={{ fontWeight: "bold" }} onClick={runShowVehicles}>
+            Vehicles
+        </Button>
                         Contact
                     </Button>
                 </Toolbar>
@@ -622,6 +632,7 @@ export default function MyApp() {
 
 
 
+            {showVehicles && <VehicleList />}
             {showContact && (
                 <Box sx={{ p: 4, textAlign: 'center', backgroundColor: 'white', borderRadius: '10px' }}>
                     <Typography variant="h3">Contact</Typography>
