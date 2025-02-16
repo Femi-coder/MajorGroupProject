@@ -1,98 +1,77 @@
-import React, { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectItem } from "@/components/ui/select";
-import Link from "next/link";
+'use client';
 
-const VehicleList = () => {
-  const [vehicles, setVehicles] = useState([]);
-  const [filteredVehicles, setFilteredVehicles] = useState([]);
-  const [search, setSearch] = useState("");
-  const [sort, setSort] = useState("price");
+import * as React from 'react';
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
+import Button from '@mui/material/Button';
+import Typography from '@mui/joy/Typography';
+import { useState } from 'react';
+import VehicleList from '../components/VehicleList';
 
-  useEffect(() => {
-    // Fetch vehicle data (Replace with actual API call)
-    const fetchVehicles = async () => {
-      const data = [
-        { id: 1, make: "Toyota", model: "Camry", year: 2022, price: 50 },
-        { id: 2, make: "Honda", model: "Civic", year: 2021, price: 45 },
-        { id: 3, make: "Ford", model: "Focus", year: 2020, price: 40 },
-      ];
-      setVehicles(data);
-      setFilteredVehicles(data);
+export default function MyApp() {
+    const [loggedIn, setLoggedIn] = useState(false);
+    const [showFirstPage, setShowFirstPage] = useState(true);
+    const [showVehicles, setShowVehicles] = useState(false);
+
+    const resetPages = () => {
+        setShowFirstPage(false);
+        setShowVehicles(false);
     };
-    fetchVehicles();
-  }, []);
 
-  useEffect(() => {
-    let filtered = vehicles.filter(vehicle =>
-      `${vehicle.make} ${vehicle.model}`.toLowerCase().includes(search.toLowerCase())
+    const runShowFirst = () => {
+        resetPages();
+        setShowFirstPage(true);
+    };
+
+    const runShowVehicles = () => {
+        resetPages();
+        setShowVehicles(true);
+    };
+
+    return (
+        <Box
+            sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100vw',
+                height: '100vh',
+                backgroundColor: '#2E3B4E',
+                color: 'lightgreen',
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+            }}
+        >
+            <AppBar
+                position="static"
+                sx={{
+                    backgroundColor: 'lightgreen',
+                    boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+                }}
+            >
+                <Toolbar>
+                    <Typography variant="h4" component="div" sx={{ flexGrow: 1, color: '#2E3B4E', fontWeight: 'bold' }}>
+                        Eco Wheels Dublin
+                    </Typography>
+                    <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowFirst}>
+                        Home
+                    </Button>
+                    <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowVehicles}>
+                        Vehicles
+                    </Button>
+                </Toolbar>
+            </AppBar>
+
+            {showFirstPage && (
+                <Box sx={{ p: 4, textAlign: 'center', backgroundColor: 'white', borderRadius: '10px' }}>
+                    <Typography variant="h3">Welcome to Eco Wheels Dublin</Typography>
+                    <Typography variant="h5">Rent your eco-friendly car today!</Typography>
+                </Box>
+            )}
+
+            {showVehicles && <VehicleList />}
+        </Box>
     );
-    
-    if (sort === "price") {
-      filtered.sort((a, b) => a.price - b.price);
-    } else if (sort === "year") {
-      filtered.sort((a, b) => b.year - a.year);
-    }
-    
-    setFilteredVehicles(filtered);
-  }, [search, sort, vehicles]);
-
-  return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Vehicle List</h1>
-      <div className="flex gap-4 mb-4">
-        <Input 
-          placeholder="Search by make or model" 
-          value={search} 
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <Select onValueChange={setSort} defaultValue={sort}>
-          <SelectItem value="price">Sort by Price</SelectItem>
-          <SelectItem value="year">Sort by Year</SelectItem>
-        </Select>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredVehicles.map((vehicle) => (
-          <Card key={vehicle.id} className="p-4">
-            <CardContent>
-              <h2 className="text-xl font-bold">{vehicle.make} {vehicle.model}</h2>
-              <p>Year: {vehicle.year}</p>
-              <p>Price: ${vehicle.price}/day</p>
-              <Button className="mt-2">Rent Now</Button>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-const Navbar = () => {
-  return (
-    <nav className="bg-green-400 p-4 flex justify-between">
-      <h1 className="font-bold">Eco Wheels Dublin</h1>
-      <div className="flex gap-4">
-        <Link href="/">HOME</Link>
-        <Link href="/register">REGISTER</Link>
-        <Link href="/login">LOGIN</Link>
-        <Link href="/student-share">STUDENT SHARE</Link>
-        <Link href="/map-api">MAP API</Link>
-        <Link href="/reviews">REVIEWS</Link>
-        <Link href="/rent">RENT</Link>
-        <Link href="/contact">CONTACT</Link>
-        <Link href="/vehicle-list" className="font-bold">VEHICLE LIST</Link>
-      </div>
-    </nav>
-  );
-};
-
-export default function Home() {
-  return (
-    <div>
-      <Navbar />
-      <VehicleList />
-    </div>
-  );
 }
