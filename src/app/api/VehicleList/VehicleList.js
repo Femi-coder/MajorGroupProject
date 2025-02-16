@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardMedia } from "@mui/material";
+import { Card, CardContent, CardMedia, Typography, Box } from "@mui/material";
 import { Button } from "@mui/material";
 import { Input } from "@mui/material";
 import { Select, MenuItem } from "@mui/material";
@@ -11,7 +11,6 @@ const VehicleList = () => {
   const [sort, setSort] = useState("price");
 
   useEffect(() => {
-    // Fetch vehicle data (Updated with correct vehicle details)
     const fetchVehicles = async () => {
       const data = [
         { id: 1, make: "BYD", model: "Dolphin", year: 2022, price: 50, image: "https://www.byd.com/content/dam/byd-site/eu/electric-cars/dolphin/xl/Dolphin-exterior-04-SkiingwhiteUrbangrey-xl.jpg" },
@@ -43,39 +42,41 @@ const VehicleList = () => {
   }, [search, sort, vehicles]);
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Choose Your Vehicle</h1>
-      <div className="flex gap-4 mb-4">
+    <Box sx={{ p: 4, textAlign: "center", backgroundColor: "#f5f5f5" }}>
+      <Typography variant="h3" sx={{ fontWeight: "bold", mb: 4 }}>Choose Your Vehicle</Typography>
+      <Box sx={{ display: "flex", gap: 2, justifyContent: "center", mb: 4 }}>
         <Input 
           placeholder="Search by make or model" 
           value={search} 
           onChange={(e) => setSearch(e.target.value)}
+          sx={{ width: "300px", p: 1, borderRadius: "5px", backgroundColor: "white" }}
         />
-        <Select value={sort} onChange={(e) => setSort(e.target.value)}>
+        <Select value={sort} onChange={(e) => setSort(e.target.value)} sx={{ width: "200px", backgroundColor: "white" }}>
           <MenuItem value="price">Sort by Price</MenuItem>
           <MenuItem value="year">Sort by Year</MenuItem>
           <MenuItem value="name">Sort by Name</MenuItem>
         </Select>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      </Box>
+      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 4 }}>
         {filteredVehicles.map((vehicle) => (
-          <Card key={vehicle.id} className="p-4">
+          <Card key={vehicle.id} sx={{ maxWidth: 345, mx: "auto", boxShadow: 3 }}>
             <CardMedia
               component="img"
               height="200"
               image={vehicle.image}
               alt={`${vehicle.make} ${vehicle.model}`}
+              sx={{ objectFit: "cover" }}
             />
             <CardContent>
-              <h2 className="text-xl font-bold">{vehicle.make} {vehicle.model}</h2>
-              <p>Year: {vehicle.year}</p>
-              <p>Price: ${vehicle.price}/day</p>
-              <Button variant="contained" className="mt-2">Rent Now</Button>
+              <Typography variant="h5" sx={{ fontWeight: "bold" }}>{vehicle.make} {vehicle.model}</Typography>
+              <Typography variant="body1">Year: {vehicle.year}</Typography>
+              <Typography variant="body1" color="primary">Price: ${vehicle.price}/day</Typography>
+              <Button variant="contained" sx={{ mt: 2, width: "100%" }}>Rent Now</Button>
             </CardContent>
           </Card>
         ))}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 
