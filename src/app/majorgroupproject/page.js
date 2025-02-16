@@ -222,19 +222,18 @@ export default function MyApp() {
 
     return (
         <Box
-            sx={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100vw',
-                height: '100vh',
-                backgroundColor: '#2E3B4E',
-                color: 'lightgreen',
-                overflow: 'hidden',
-                display: 'flex',
-                flexDirection: 'column',
-            }}
-        >
+    sx={{
+        position: 'relative', // Change from absolute to relative
+        width: '100vw',
+        minHeight: '100vh', // Ensure full height
+        backgroundColor: '#2E3B4E',
+        color: 'lightgreen',
+        overflowY: 'auto', // ✅ Enables vertical scrolling
+        display: 'flex',
+        flexDirection: 'column',
+    }}
+>
+
             <AppBar
                 position="static"
                 sx={{
