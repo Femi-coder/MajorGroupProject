@@ -1,77 +1,73 @@
-'use client';
+import React, { useState, useEffect } from "react";
+import { Card, CardContent } from "@mui/material";
+import { Button } from "@mui/material";
+import { Input } from "@mui/material";
+import { Select, MenuItem } from "@mui/material";
 
-import * as React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import Button from '@mui/material/Button';
-import Typography from '@mui/joy/Typography';
-import { useState } from 'react';
-import VehicleList from '../components/VehicleList';
+const VehicleList = () => {
+  const [vehicles, setVehicles] = useState([]);
+  const [filteredVehicles, setFilteredVehicles] = useState([]);
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState("price");
 
-export default function MyApp() {
-    const [loggedIn, setLoggedIn] = useState(false);
-    const [showFirstPage, setShowFirstPage] = useState(true);
-    const [showVehicles, setShowVehicles] = useState(false);
-
-    const resetPages = () => {
-        setShowFirstPage(false);
-        setShowVehicles(false);
+  useEffect(() => {
+    // Fetch vehicle data (Replace with actual API call)
+    const fetchVehicles = async () => {
+      const data = [
+        { id: 1, make: "Toyota", model: "Camry", year: 2022, price: 50 },
+        { id: 2, make: "Honda", model: "Civic", year: 2021, price: 45 },
+        { id: 3, make: "Ford", model: "Focus", year: 2020, price: 40 },
+        { id: 4, make: "Tesla", model: "Model 3", year: 2023, price: 70 },
+        { id: 5, make: "BMW", model: "X5", year: 2022, price: 80 },
+      ];
+      setVehicles(data);
+      setFilteredVehicles(data);
     };
+    fetchVehicles();
+  }, []);
 
-    const runShowFirst = () => {
-        resetPages();
-        setShowFirstPage(true);
-    };
-
-    const runShowVehicles = () => {
-        resetPages();
-        setShowVehicles(true);
-    };
-
-    return (
-        <Box
-            sx={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100vw',
-                height: '100vh',
-                backgroundColor: '#2E3B4E',
-                color: 'lightgreen',
-                overflow: 'hidden',
-                display: 'flex',
-                flexDirection: 'column',
-            }}
-        >
-            <AppBar
-                position="static"
-                sx={{
-                    backgroundColor: 'lightgreen',
-                    boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
-                }}
-            >
-                <Toolbar>
-                    <Typography variant="h4" component="div" sx={{ flexGrow: 1, color: '#2E3B4E', fontWeight: 'bold' }}>
-                        Eco Wheels Dublin
-                    </Typography>
-                    <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowFirst}>
-                        Home
-                    </Button>
-                    <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowVehicles}>
-                        Vehicles
-                    </Button>
-                </Toolbar>
-            </AppBar>
-
-            {showFirstPage && (
-                <Box sx={{ p: 4, textAlign: 'center', backgroundColor: 'white', borderRadius: '10px' }}>
-                    <Typography variant="h3">Welcome to Eco Wheels Dublin</Typography>
-                    <Typography variant="h5">Rent your eco-friendly car today!</Typography>
-                </Box>
-            )}
-
-            {showVehicles && <VehicleList />}
-        </Box>
+  useEffect(() => {
+    let filtered = vehicles.filter(vehicle =>
+      `${vehicle.make} ${vehicle.model}`.toLowerCase().includes(search.toLowerCase())
     );
-}
+    
+    if (sort === "price") {
+      filtered.sort((a, b) => a.price - b.price);
+    } else if (sort === "year") {
+      filtered.sort((a, b) => b.year - a.year);
+    }
+    
+    setFilteredVehicles(filtered);
+  }, [search, sort, vehicles]);
+
+  return (
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Choose Your Vehicle</h1>
+      <div className="flex gap-4 mb-4">
+        <Input 
+          placeholder="Search by make or model" 
+          value={search} 
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <Select value={sort} onChange={(e) => setSort(e.target.value)}>
+          <MenuItem value="price">Sort by Price</MenuItem>
+          <MenuItem value="year">Sort by Year</MenuItem>
+        </Select>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filteredVehicles.map((vehicle) => (
+          <Card key={vehicle.id} className="p-4">
+            <CardContent>
+              <h2 className="text-xl font-bold">{vehicle.make} {vehicle.model}</h2>
+              <p>Year: {vehicle.year}</p>
+              <p>Price: ${vehicle.price}/day</p>
+              <Button variant="contained" className="mt-2">Rent Now</Button>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default VehicleList;
