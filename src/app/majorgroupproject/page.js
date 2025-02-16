@@ -35,7 +35,6 @@ export default function MyApp() {
     const resetPages = () => {
     const runShowVehicles = () => {
         resetPages();
-        setShowVehicles(true);
     };
 
         setShowFirstPage(false);
@@ -46,6 +45,8 @@ export default function MyApp() {
         setShowReviews(false);
         setShowRent(false);
         setShowContact(false);
+        setShowVehicles(false);
+
     };
 
     const runShowFirst = () => {
