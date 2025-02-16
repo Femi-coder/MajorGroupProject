@@ -88,6 +88,12 @@ export default function MyApp() {
         setShowContact(true);
     };
 
+    const runShowVehicles = () => {
+        resetPages(); // Ensure all other sections are hidden
+        setShowVehicles(true);
+    };
+    
+
     const handleLogin = () => {
         const email = document.querySelector('input[name="email"]').value;
         const password = document.querySelector('input[name="password"]').value;
