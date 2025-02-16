@@ -21,6 +21,19 @@ const VehicleList = () => {
         { id: 6, make: "Audi", model: "Q6 E-Tron", year: 2025, price: 175, image: "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQJQ94kMS27fDB0AHLvy60P-CPRpIeb524xYwCbwqRz6yhCZgE-" },
         { id: 7, make: "BMW", model: "iX", year: 2024, price: 205, image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTugWhgSDy76DrH3wNjyvyweDBRXCYk3VnvtEWpIFHcgIMG-URA" },
         { id: 8, make: "BMW", model: "i4", year: 2022, price: 195, image: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTWHD-Mk5QG1j6_Cx8EKYhBH6o468cy_FgB5y_EdpbvYBAghh4n" },
+        { id: 9, make: "Mini", model: "Electric", year: 2022, price: 75, image: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRBfyjKFeW0Nuf9AinLX9kfkheVU7Prq-a5S7fOPe-Imk2VWOg-" },
+        { id: 10, make: "Ford", model: "Mustang Mach-E", year: 2021, price: 210, image: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSpGLYQMYbxoRQIZDjIbv7dl75Mxoenz4B_v1RA72huW8ysZGIS" },
+        { id: 11, make: "Volkswagen", model: "ID.4", year: 2022, price: 145, image: "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcR94dMA2TiqdgB099fUlZLZLVlSUv_d3rS4D4X3GgoQ75Qnpdxm" },
+        { id: 12, make: "BMW", model: "i5", year: 2025, price: 200, image: "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRqDRhoGT7E2UTug0F6wC9bXqrEjKmR31vn0RwvA3s2xk1R5fFq" },
+        { id: 13, make: "Hyundai", model: "IONIQ 6", year: 2023, price: 99, image: "https://s7g10.scene7.com/is/image/hyundaiautoever/hyundai-ioniq-6-first-edition-presales-start-01:Content%20Banner%20Mobile?wid=767&hei=668" },
+        { id: 14, make: "BMW", model: "i4", year: 2022, price: 195, image: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTWHD-Mk5QG1j6_Cx8EKYhBH6o468cy_FgB5y_EdpbvYBAghh4n" },
+        { id: 15, make: "BMW", model: "i4", year: 2022, price: 195, image: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTWHD-Mk5QG1j6_Cx8EKYhBH6o468cy_FgB5y_EdpbvYBAghh4n" },
+        { id: 16, make: "BMW", model: "i4", year: 2022, price: 195, image: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTWHD-Mk5QG1j6_Cx8EKYhBH6o468cy_FgB5y_EdpbvYBAghh4n" },
+        { id: 17, make: "BMW", model: "i4", year: 2022, price: 195, image: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTWHD-Mk5QG1j6_Cx8EKYhBH6o468cy_FgB5y_EdpbvYBAghh4n" },
+        { id: 18, make: "BMW", model: "i4", year: 2022, price: 195, image: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTWHD-Mk5QG1j6_Cx8EKYhBH6o468cy_FgB5y_EdpbvYBAghh4n" },
+        { id: 19, make: "BMW", model: "i4", year: 2022, price: 195, image: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTWHD-Mk5QG1j6_Cx8EKYhBH6o468cy_FgB5y_EdpbvYBAghh4n" },
+        { id: 20, make: "BMW", model: "i4", year: 2022, price: 195, image: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTWHD-Mk5QG1j6_Cx8EKYhBH6o468cy_FgB5y_EdpbvYBAghh4n" },
+        { id: 21, make: "BMW", model: "i4", year: 2022, price: 195, image: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTWHD-Mk5QG1j6_Cx8EKYhBH6o468cy_FgB5y_EdpbvYBAghh4n" },
       ];
       setVehicles(data);
       setFilteredVehicles(data);
