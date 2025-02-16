@@ -376,7 +376,7 @@ export default function MyApp() {
             </Box>
         </Box>
 
-        {/* Buttons for Explore Rental Options & Student Share (Side by Side) */}
+        {/* Buttons for Explore Rent Options & Student Share (Side by Side) */}
         {loggedIn && (
             <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center', gap: 2 }}>
                 <Button
