@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectItem } from "@/components/ui/select";
+import Link from "next/link";
 
 const VehicleList = () => {
   const [vehicles, setVehicles] = useState([]);
@@ -68,9 +69,29 @@ const VehicleList = () => {
   );
 };
 
+const Navbar = () => {
+  return (
+    <nav className="bg-green-400 p-4 flex justify-between">
+      <h1 className="font-bold">Eco Wheels Dublin</h1>
+      <div className="flex gap-4">
+        <Link href="/">HOME</Link>
+        <Link href="/register">REGISTER</Link>
+        <Link href="/login">LOGIN</Link>
+        <Link href="/student-share">STUDENT SHARE</Link>
+        <Link href="/map-api">MAP API</Link>
+        <Link href="/reviews">REVIEWS</Link>
+        <Link href="/rent">RENT</Link>
+        <Link href="/contact">CONTACT</Link>
+        <Link href="/vehicle-list" className="font-bold">VEHICLE LIST</Link>
+      </div>
+    </nav>
+  );
+};
+
 export default function Home() {
   return (
     <div>
+      <Navbar />
       <VehicleList />
     </div>
   );
