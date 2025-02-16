@@ -66,6 +66,10 @@ const VehicleList = () => {
           </Card>
         ))}
       </div>
+      <div className="flex gap-4 mt-4">
+        <Button color="inherit" sx={{ fontWeight: "bold" }} onClick={() => console.log("Vehicles Clicked")}>Vehicles</Button>
+        <Button color="inherit" sx={{ fontWeight: "bold" }} onClick={() => console.log("Contact Clicked")}>Contact</Button>
+      </div>
     </div>
   );
 };
