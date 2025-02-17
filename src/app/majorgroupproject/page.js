@@ -388,7 +388,7 @@ export default function MyApp() {
                             backgroundColor: '#4C5E72',
                         },
                     }}
-                    onClick={runShowRent} // Navigate to Rental Options
+                    onClick={runShowVehicles} // Navigate to Vehicles Page
                 >
                     Explore Rental Options
                 </Button>
@@ -639,11 +639,11 @@ export default function MyApp() {
 
 
 
-            {showVehicles && <VehicleList />}
+            {showVehicles && <VehicleList username={username} />}
             {showContact && (
                 <Box sx={{ p: 4, textAlign: 'center', backgroundColor: 'white', borderRadius: '10px' }}>
                     <Typography variant="h3">Contact</Typography>
-                    <Typography>Page is under construction</Typography>
+                    <Typography>Page under construction</Typography>
                 </Box>
             )}
         </Box>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation"; // ✅ Ensure useRouter is imported correctly
 import { Box, Typography, Card, CardMedia, CardContent, Button } from "@mui/material";
 
 const vehiclesData = [
@@ -26,14 +26,13 @@ const vehiclesData = [
     { id: 19, make: "Kia", model: "EV9", year: 2025, price: 225, image: "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcSypRXfJPg0RQkT7Ms0ySqqocZ4ZeNIkO4qx-FHmMK7whTA7uMK" },
     { id: 20, make: "Porsche", model: "Taycan", year: 2020, price: 165, image: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSLYdqQNQTs9S75EAZ_dewjddp5-UXzXj6nTB3xn3rmX6KREf_G" },
     { id: 21, make: "Porsche", model: "Macan", year: 2025, price: 299, image: "https://images.dealer.com/ddc/vehicles/2025/Porsche/Macan%20Electric/SUV/color/Volcano%20Grey%20Metallic-2H-42,42,41-640-en_US.jpg" },
-
 ];
 
 const VehicleList = () => {
-  const router = useRouter();
+  const router = useRouter(); // ✅ Ensure useRouter is initialized
+
   const [vehicles, setVehicles] = useState([]);
 
-  // Load vehicle data
   useEffect(() => {
     setVehicles(vehiclesData);
   }, []);
@@ -43,14 +42,17 @@ const VehicleList = () => {
       <Typography variant="h3" sx={{ fontWeight: "bold", mb: 4 }}>Choose Your Vehicle</Typography>
       <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 4 }}>
         {vehicles.map((vehicle) => (
-          <Card key={vehicle.id} sx={{ maxWidth: 345, mx: "auto", boxShadow: 3 }}>
+          <Card 
+            key={vehicle.id} 
+            sx={{ maxWidth: 345, mx: "auto", boxShadow: 3, cursor: "pointer" }}
+            onClick={() => router.push(`/vehicle/${vehicle.id}`)} // ✅ Correctly navigate to vehicle details page
+          >
             <CardMedia
               component="img"
               height="200"
               image={vehicle.image}
               alt={`${vehicle.make} ${vehicle.model}`}
-              sx={{ objectFit: "cover", cursor: "pointer" }}
-              onClick={() => router.push(`/vehicle/${vehicle.id}`)} // ✅ Click to navigate
+              sx={{ objectFit: "cover" }}
             />
             <CardContent>
               <Typography variant="h5" sx={{ fontWeight: "bold" }}>{vehicle.make} {vehicle.model}</Typography>
