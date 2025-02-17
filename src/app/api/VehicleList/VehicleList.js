@@ -4,11 +4,12 @@ import { Button } from "@mui/material";
 import { Input } from "@mui/material";
 import { Select, MenuItem } from "@mui/material";
 
-const VehicleList = () => {
+const VehicleList = ({ username }) => {
   const [vehicles, setVehicles] = useState([]);
   const [filteredVehicles, setFilteredVehicles] = useState([]);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("price");
+  
 
   useEffect(() => {
     const fetchVehicles = async () => {
@@ -59,6 +60,7 @@ const VehicleList = () => {
 
   return (
     <Box sx={{ p: 4, textAlign: "center", backgroundColor: "#f5f5f5" }}>
+      {username ? `Hello, ${username}!` : "Welcome to the Vehicle List"}
       <Typography variant="h3" sx={{ fontWeight: "bold", mb: 4 }}>Choose Your Vehicle</Typography>
       <Box sx={{ display: "flex", gap: 2, justifyContent: "center", mb: 4 }}>
         <Input 
