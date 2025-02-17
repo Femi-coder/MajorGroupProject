@@ -39,10 +39,9 @@ const VehicleList = () => {
     setVehicles(vehiclesData);
   }, []);
 
-  // ✅ Open Modal Directly (NO NAVIGATION)
-  const handleOpen = (event, vehicle) => {
-    event.preventDefault();  // 🚨 Prevents navigation
-    event.stopPropagation(); // 🚨 Stops any unwanted events
+  // ✅ Open Modal Directly (No Navigation)
+  const handleOpen = (vehicle, event) => {
+    event.preventDefault(); // 🚨 Prevents navigation
     setSelectedVehicle(vehicle);
     setOpen(true);
   };
@@ -62,7 +61,7 @@ const VehicleList = () => {
           <Card 
             key={vehicle.id} 
             sx={{ maxWidth: 345, mx: "auto", boxShadow: 3, cursor: "pointer" }}
-            onClick={(event) => handleOpen(event, vehicle)} // ✅ Open Modal Directly, NO NAVIGATION
+            onClick={(event) => handleOpen(vehicle, event)} // ✅ Prevent navigation
           >
             <CardMedia
               component="img"
@@ -78,7 +77,7 @@ const VehicleList = () => {
               <Button 
                 variant="contained" 
                 sx={{ mt: 2, width: "100%" }} 
-                onClick={(event) => handleOpen(event, vehicle)} // ✅ Prevents navigation on button
+                onClick={(event) => handleOpen(vehicle, event)} // ✅ Also ensure button does not navigate
               >
                 View Details
               </Button>
@@ -149,6 +148,26 @@ const VehicleList = () => {
                       <li>Theft Excess: {selectedVehicle.theftExcess}</li>
                     </ul>
                   </Box>
+                </Box>
+
+                {/* Notes Section */}
+                <Box 
+                  sx={{ 
+                    mt: 3, 
+                    p: 2, 
+                    backgroundColor: "#f9f9f9", 
+                    borderRadius: 2, 
+                    boxShadow: "0px 4px 8px rgba(0,0,0,0.1)"
+                  }}
+                >
+                  <Typography variant="h6" sx={{ fontWeight: "bold", color: "#222", mb: 1 }}>
+                    Please Note
+                  </Typography>
+                  <ul style={{ paddingLeft: "20px", color: "#444", fontSize: "15px" }}>
+                    {selectedVehicle.notes.map((note, index) => (
+                      <li key={index}>{note}</li>
+                    ))}
+                  </ul>
                 </Box>
               </>
             )}

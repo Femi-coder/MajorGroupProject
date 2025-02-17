@@ -126,7 +126,15 @@ const VehicleList = () => {
 
                   {/* Right: Vehicle Information */}
                   <Box sx={{ width: { xs: "100%", md: "50%" } }}>
-                    <Typography variant="h5" sx={{ fontWeight: "bold", mb: 2 }}>
+                    <Typography variant="h5" 
+  sx={{ 
+    fontWeight: "bold", 
+    color: "#222",  // ✅ Darker contrast
+    fontSize: "24px", // ✅ Increased font size
+    textShadow: "1px 1px 3px rgba(0, 0, 0, 0.2)", // ✅ Subtle shadow for clarity
+    mb: 2 
+  }}
+>
                       {selectedVehicle.make} {selectedVehicle.model} ({selectedVehicle.year})
                     </Typography>
                     <Typography variant="body1" color="primary" sx={{ fontSize: "18px", mb: 2 }}>
