@@ -1,10 +1,9 @@
 "use client";
 
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Box, Typography, Card, CardMedia, CardContent, Grid } from "@mui/material";
+import { useState, useEffect } from "react";
+import { Box, Typography, Card, CardMedia, CardContent, Button, Modal, Fade, Backdrop } from "@mui/material";
 
-// ✅ Full vehicle data for dynamic rendering
+// ✅ Vehicle Data
 const vehiclesData = [
   { 
     id: 1, 
@@ -31,114 +30,133 @@ const vehiclesData = [
   }
 ];
 
-const VehicleDetails = () => {
-  const { id } = useParams();
-  const [vehicle, setVehicle] = useState(null);
+const VehicleList = () => {
+  const [vehicles, setVehicles] = useState([]);
+  const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (id) {
-      const selectedVehicle = vehiclesData.find(v => v.id === parseInt(id));
-      setVehicle(selectedVehicle);
-    }
-  }, [id]);
+    setVehicles(vehiclesData);
+  }, []);
 
-  if (!vehicle) {
-    return <Typography variant="h5" sx={{ textAlign: "center", mt: 5 }}>Vehicle Not Found</Typography>;
-  }
+  // ✅ Open Modal Directly (NO NAVIGATION)
+  const handleOpen = (event, vehicle) => {
+    event.preventDefault();  // 🚨 Prevents navigation
+    event.stopPropagation(); // 🚨 Stops any unwanted events
+    setSelectedVehicle(vehicle);
+    setOpen(true);
+  };
+
+  // ✅ Close Modal
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   return (
-    <Box 
-      sx={{ 
-        p: 4, 
-        maxWidth: 900, 
-        mx: "auto", 
-        backgroundColor: "#ffffff", 
-        borderRadius: 2, 
-        boxShadow: 3 
-      }}
-    >
-      <Grid container spacing={2}>
-        
-        {/* Left Side: Image */}
-        <Grid item xs={12} md={4}>
-          <CardMedia
-            component="img"
-            image={vehicle.image}
-            alt={`${vehicle.make} ${vehicle.model}`}
-            sx={{ 
-              width: "100%", 
-              borderRadius: 2, 
-              boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)" 
-            }} // ✅ Improved shadow on image
-          />
-        </Grid>
-
-        {/* Right Side: Details */}
-        <Grid item xs={12} md={8}>
-          <CardContent>
-            <Typography 
-              variant="h5" 
-              sx={{ 
-                fontWeight: "bold", 
-                color: "#333", 
-                textShadow: "1px 1px 3px rgba(0,0,0,0.2)" 
-              }} // ✅ Darker, more readable text
-            >
-              {vehicle.category}
-            </Typography>
-            <Typography 
-              variant="subtitle1" 
-              sx={{ 
-                color: "#555", 
-                mb: 2, 
-                textShadow: "0px 1px 3px rgba(0,0,0,0.1)" 
-              }} // ✅ Subtle shadow for readability
-            >
-              {vehicle.type}
-            </Typography>
-            
-            {/* Specifications */}
-            <ul style={{ paddingLeft: "20px", color: "#222", fontSize: "16px" }}>
-              <li><strong>{vehicle.passengers}</strong> Passengers</li>
-              <li>{vehicle.luggage}</li>
-              <li>{vehicle.transmission}</li>
-              <li>{vehicle.airConditioning}</li>
-              <li>Fuel Consumption: {vehicle.fuelConsumption}</li>
-              <li>Damage Excess: {vehicle.damageExcess}</li>
-              <li>Theft Excess: {vehicle.theftExcess}</li>
-            </ul>
-          </CardContent>
-        </Grid>
-      </Grid>
-
-      {/* Notes Section */}
-      <Box 
-        sx={{ 
-          mt: 3, 
-          p: 2, 
-          backgroundColor: "#f9f9f9", 
-          borderRadius: 2, 
-          boxShadow: "0px 4px 8px rgba(0,0,0,0.1)"
-        }} // ✅ Light gray background for notes
-      >
-        <Typography 
-          variant="h6" 
-          sx={{ 
-            fontWeight: "bold", 
-            color: "#222", 
-            mb: 1 
-          }} // ✅ Darker text for contrast
-        >
-          Please Note
-        </Typography>
-        <ul style={{ paddingLeft: "20px", color: "#444", fontSize: "15px" }}>
-          {vehicle.notes.map((note, index) => (
-            <li key={index}>{note}</li>
-          ))}
-        </ul>
+    <Box sx={{ p: 4, textAlign: "center", backgroundColor: "#f5f5f5" }}>
+      <Typography variant="h3" sx={{ fontWeight: "bold", mb: 4 }}>Choose Your Vehicle</Typography>
+      
+      {/* ✅ Vehicle List */}
+      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 4 }}>
+        {vehicles.map((vehicle) => (
+          <Card 
+            key={vehicle.id} 
+            sx={{ maxWidth: 345, mx: "auto", boxShadow: 3, cursor: "pointer" }}
+            onClick={(event) => handleOpen(event, vehicle)} // ✅ Open Modal Directly, NO NAVIGATION
+          >
+            <CardMedia
+              component="img"
+              height="200"
+              image={vehicle.image}
+              alt={`${vehicle.make} ${vehicle.model}`}
+              sx={{ objectFit: "cover" }}
+            />
+            <CardContent>
+              <Typography variant="h5" sx={{ fontWeight: "bold" }}>{vehicle.make} {vehicle.model}</Typography>
+              <Typography variant="body1">Year: {vehicle.year}</Typography>
+              <Typography variant="body1" color="primary">Price: ${vehicle.price}/day</Typography>
+              <Button 
+                variant="contained" 
+                sx={{ mt: 2, width: "100%" }} 
+                onClick={(event) => handleOpen(event, vehicle)} // ✅ Prevents navigation on button
+              >
+                View Details
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
       </Box>
+
+      {/* ✅ Vehicle Details Modal (Overlay) */}
+      <Modal
+        open={open}
+        onClose={handleClose}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{ timeout: 500 }}
+      >
+        <Fade in={open}>
+          <Box 
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "90%",
+              maxWidth: "800px",
+              bgcolor: "white",
+              borderRadius: 2,
+              boxShadow: 24,
+              p: 4,
+              outline: "none"
+            }}
+          >
+            {selectedVehicle && (
+              <>
+                {/* ✅ Close Button */}
+                <Button 
+                  onClick={handleClose} 
+                  sx={{ position: "absolute", top: 10, right: 10, color: "#555", fontSize: "16px" }}
+                >
+                  ✕ CLOSE
+                </Button>
+
+                <Typography variant="h5" sx={{ fontWeight: "bold", mb: 2 }}>
+                  {selectedVehicle.category}
+                </Typography>
+                <Typography variant="subtitle1" sx={{ color: "gray", mb: 2 }}>
+                  {selectedVehicle.type}
+                </Typography>
+
+                <Box sx={{ display: "flex", gap: 2 }}>
+                  {/* Left: Image */}
+                  <CardMedia
+                    component="img"
+                    image={selectedVehicle.image}
+                    alt={selectedVehicle.model}
+                    sx={{ width: "50%", borderRadius: 2 }}
+                  />
+
+                  {/* Right: Details */}
+                  <Box sx={{ width: "50%" }}>
+                    <ul style={{ paddingLeft: "20px", color: "#222", fontSize: "16px" }}>
+                      <li><strong>{selectedVehicle.passengers}</strong> Passengers</li>
+                      <li>{selectedVehicle.luggage}</li>
+                      <li>{selectedVehicle.transmission}</li>
+                      <li>{selectedVehicle.airConditioning}</li>
+                      <li>Fuel Consumption: {selectedVehicle.fuelConsumption}</li>
+                      <li>Damage Excess: {selectedVehicle.damageExcess}</li>
+                      <li>Theft Excess: {selectedVehicle.theftExcess}</li>
+                    </ul>
+                  </Box>
+                </Box>
+              </>
+            )}
+          </Box>
+        </Fade>
+      </Modal>
     </Box>
   );
 };
 
-export default VehicleDetails;
+export default VehicleList;
