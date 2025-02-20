@@ -5,7 +5,7 @@ import { Box, Typography, Card, CardMedia, CardContent, Button, Modal, Fade, Bac
 
 // ✅ Full Vehicle Data List
 const vehiclesData = [
-    { id: 1, make: "BYD", model: "Dolphin", year: 2022, price: 50, image: "https://www.byd.com/content/dam/byd-site/eu/electric-cars/dolphin/xl/Dolphin-exterior-04-SkiingwhiteUrbangrey-xl.jpg", transmission: "Automatic", seats: 5, range: "300 miles", type: "Hatchback", fuel: "Electric" },
+    { id: 1, make: "BYD", model: "Dolphin", year: 2022, price: 50, image: "https://www.byd.com/content/dam/byd-site/eu/electric-cars/dolphin/xl/Dolphin-exterior-04-SkiingwhiteUrbangrey-xl.jpg", transmission: "Automatic", seats: 5, range: "300 miles", type: "Hatchback", fuel: "Electric", availability: true },
     { id: 2, make: "Tesla", model: "Model S", year: 2023, price: 45, image: "https://static1.topspeedimages.com/wordpress/wp-content/uploads/2023/06/tesla-model-s-plaid-2.jpg", transmission: "Automatic", seats: 5, range: "396 miles", type: "Sedan", fuel: "Electric" },
     { id: 3, make: "Tesla", model: "Model 3", year: 2022, price: 40, image: "https://www.tesla.com/ownersmanual/images/GUID-B5641257-9E85-404B-9667-4DA5FDF6D2E7-online-en-US.png", transmission: "Automatic", seats: 5, range: "358 miles", type: "Sedan", fuel: "Electric" },
     { id: 4, make: "Tesla", model: "Model X", year: 2021, price: 70, image: "https://images.prismic.io/carwow/c340a77d-af56-4562-abfb-bd5518ccb292_2023+Tesla+Model+X+front+quarter+moving.jpg", transmission: "Automatic", seats: 7, range: "333 miles", type: "SUV", fuel: "Electric" },
@@ -34,7 +34,8 @@ const VehicleList = () => {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    setVehicles(vehiclesData);
+    const availableVehicles = vehiclesData.filter(vehicle => vehicle.availability); // ✅ Show only available cars
+    setVehicles(availableVehicles);
   }, []);
 
   // ✅ Open Modal (NO NAVIGATION)
@@ -48,6 +49,19 @@ const VehicleList = () => {
   // ✅ Close Modal
   const handleClose = () => {
     setOpen(false);
+  };
+  const handleRent = (vehicleId) => {
+    setVehicles(prevVehicles => 
+        prevVehicles.map(vehicle =>
+            vehicle.id === vehicleId ? { ...vehicle, availability: false } : vehicle
+        )
+    );
+
+    if (selectedVehicle?.id === vehicleId) {
+      setSelectedVehicle({ ...selectedVehicle, availability: false });
+    }
+
+    alert("Vehicle has been rented!");
   };
 
   return (
@@ -73,7 +87,8 @@ const VehicleList = () => {
               <Typography variant="h5" sx={{ fontWeight: "bold" }}>{vehicle.make} {vehicle.model}</Typography>
               <Typography variant="body1">Year: {vehicle.year}</Typography>
               <Typography variant="body1" color="primary">Price: ${vehicle.price}/day</Typography>
-              <Button variant="contained" sx={{ mt: 2, width: "100%" }}>Rent Now</Button>
+              <Button variant="contained" sx={{ mt: 2, width: "100%" }}  disabled={!vehicle.availability} >{vehicle.availability ? "Rent Now" : "Unavailable"}
+              </Button>
             </CardContent>
           </Card>
         ))}
@@ -152,8 +167,11 @@ const VehicleList = () => {
 
                 {/* Rent Button */}
                 <Box sx={{ textAlign: "center", mt: 3 }}>
-                  <Button variant="contained" color="primary" sx={{ width: "50%" }}>
-                    Rent This Vehicle
+                  <Button variant="contained" color="primary" sx={{ width: "50%" }}  disabled={!selectedVehicle.availability} 
+                    onClick={() => handleRent(selectedVehicle.id)} // ✅ Handle rent
+                  >
+                    {selectedVehicle.availability ? "Rent This Vehicle" : "Unavailable"}
+                  
                   </Button>
                 </Box>
               </>
