@@ -613,7 +613,6 @@ export default function MyApp() {
 
         {/* Rental Form */}
         <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <TextField label="Renter ID" variant="outlined" required fullWidth />
             <TextField label="Pickup Location" variant="outlined" required fullWidth />
             <TextField label="Drop-off Location" variant="outlined" required fullWidth />
             <TextField label="Rental Start Date" type="date" InputLabelProps={{ shrink: true }} required fullWidth />
