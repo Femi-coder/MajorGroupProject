@@ -72,6 +72,7 @@ export default function MyApp() {
     const runShowMapApi = () => {
         if (!loggedIn) {
             alert("You must be logged in to access the Map API.");
+            runShowLogin();
             return;
         }
         resetPages();
@@ -85,7 +86,8 @@ export default function MyApp() {
 
     const runShowRent = () => {
         if (!loggedIn) {
-            alert("You must be logged in to access the Map API.");
+            alert("You must be logged in to access the Rent page.");
+            runShowLogin();
             return;
         }
         resetPages();
@@ -94,7 +96,7 @@ export default function MyApp() {
 
     const runShowContact = () => {
         if (!loggedIn) {
-            alert("You must be logged in to access the Map API.");
+            alert("You must be logged in to access the Contact Page.");
             return;
         }
         resetPages();
@@ -103,7 +105,8 @@ export default function MyApp() {
 
     const runShowVehicles = () => {
         if (!loggedIn) {
-            alert("You must be logged in to access the Map API.");
+            alert("You must be logged in to access the Vehicles Page.");
+            runShowLogin();
             return;
         }
         resetPages();
