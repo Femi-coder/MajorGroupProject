@@ -70,6 +70,10 @@ export default function MyApp() {
     };
 
     const runShowMapApi = () => {
+        if (!loggedIn) {
+            alert("You must be logged in to access the Map API.");
+            return;
+        }
         resetPages();
         setShowMapApi(true);
     };
@@ -80,17 +84,29 @@ export default function MyApp() {
     };
 
     const runShowRent = () => {
+        if (!loggedIn) {
+            alert("You must be logged in to access the Map API.");
+            return;
+        }
         resetPages();
         setShowRent(true);
     };
 
     const runShowContact = () => {
+        if (!loggedIn) {
+            alert("You must be logged in to access the Map API.");
+            return;
+        }
         resetPages();
         setShowContact(true);
     };
 
     const runShowVehicles = () => {
-        resetPages(); // Ensure all other sections are hidden
+        if (!loggedIn) {
+            alert("You must be logged in to access the Map API.");
+            return;
+        }
+        resetPages();
         setShowVehicles(true);
     };
     
