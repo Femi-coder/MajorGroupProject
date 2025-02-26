@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Box, Typography, Card, CardMedia, CardContent, Button, Modal, Fade, Backdrop } from "@mui/material";
 
-const VehicleList = ({ username }) => {
+const VehicleList = ({ username, runShowRent }) => {
   const [vehicles, setVehicles] = useState([]);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [open, setOpen] = useState(false);
@@ -15,7 +15,7 @@ const VehicleList = ({ username }) => {
       .catch(error => console.error("Error fetching vehicles:", error));
   }, []);
 
-  // ✅ Open Modal
+  //  Open Modal
   const handleOpen = (event, vehicle) => {
     event.preventDefault();
     event.stopPropagation();
@@ -23,13 +23,13 @@ const VehicleList = ({ username }) => {
     setOpen(true);
   };
 
-  // ✅ Close Modal
+  // Close Modal
   const handleClose = () => {
     setOpen(false);
   };
 
-  // ✅ Rent Vehicle Function
-  const handleRent = (carId) => {
+  // Rent Vehicle Function
+  const handleRent = (carId, vehicle) => {
     fetch("/api/rent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -41,17 +41,15 @@ const VehicleList = ({ username }) => {
             alert(data.error);
         } else {
             setVehicles(prevVehicles => 
-                prevVehicles.map(vehicle =>
-                    vehicle.carId === carId ? { ...vehicle, availability: false } : vehicle
-                )
+                prevVehicles.map(v => v.carId === carId ? { ...v, availability: false } : v)
             );
             alert("Vehicle has been rented!");
             setOpen(false);
+            runShowRent(vehicle); // Redirects to Rent page with vehicle details
         }
     })
     .catch(error => console.error("Error renting vehicle:", error));
 };
-
 
   return (
     <Box sx={{ p: 4, textAlign: "center", backgroundColor: "#f5f5f5" }}>
@@ -62,7 +60,7 @@ const VehicleList = ({ username }) => {
       )}
       <Typography variant="h3" sx={{ fontWeight: "bold", mb: 4 }}>Choose Your Vehicle</Typography>
 
-      {/* ✅ Vehicle List */}
+      {/* Vehicle List */}
       <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 4 }}>
         {vehicles.map((vehicle) => (
           <Card key={vehicle.carId} sx={{ maxWidth: 345, mx: "auto", boxShadow: 3, cursor: "pointer" }} onClick={(event) => handleOpen(event, vehicle)}>
@@ -85,7 +83,7 @@ const VehicleList = ({ username }) => {
         ))}
       </Box>
 
-      {/* ✅ Vehicle Details Modal */}
+      {/* Vehicle Details Modal */}
       <Modal open={open} onClose={handleClose} closeAfterTransition BackdropComponent={Backdrop} BackdropProps={{ timeout: 500 }}>
         <Fade in={open}>
           <Box sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: "90%", maxWidth: "800px", bgcolor: "white", borderRadius: 2, boxShadow: 24, p: 4, outline: "none" }}>
@@ -116,7 +114,7 @@ const VehicleList = ({ username }) => {
                 </Box>
 
                 <Box sx={{ textAlign: "center", mt: 3 }}>
-                  <Button variant="contained" color="primary" sx={{ width: "50%" }} disabled={!selectedVehicle.availability} onClick={() => handleRent(selectedVehicle.carId)}>
+                  <Button variant="contained" color="primary" sx={{ width: "50%" }} disabled={!selectedVehicle.availability} onClick={() => handleRent(selectedVehicle.carId, selectedVehicle)}>
                     Rent This Vehicle
                   </Button>
                 </Box>

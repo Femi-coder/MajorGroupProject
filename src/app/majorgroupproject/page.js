@@ -29,6 +29,7 @@ export default function MyApp() {
     const [userEmail, setUserEmail] = useState('');
     const [studentShareRegistered, setStudentShareRegistered] = useState(false);
     const [studentShareDetails, setStudentShareDetails] = useState(null);
+    const [selectedRentVehicle, setSelectedRentVehicle] = useState(null);
 
 
 
@@ -84,12 +85,13 @@ export default function MyApp() {
         setShowReviews(true);
     };
 
-    const runShowRent = () => {
+    const runShowRent = (vehicle = null) => {
         if (!loggedIn) {
             alert("You must be logged in to access the Rent page.");
             runShowLogin();
             return;
         }
+        setSelectedRentVehicle(vehicle);
         resetPages();
         setShowRent(true);
     };
@@ -622,6 +624,15 @@ export default function MyApp() {
             margin: 'auto',
         }}
     >
+        {selectedRentVehicle && (
+            <Box sx={{ mb: 3 }}>
+                <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2, color: "#2E3B4E" }}>
+                    {selectedRentVehicle.make} {selectedRentVehicle.model} ({selectedRentVehicle.year})
+                </Typography>
+                <img src={selectedRentVehicle.image} alt={selectedRentVehicle.model} style={{ width: "100%", borderRadius: "10px" }} />
+                <Typography variant="h6" sx={{ mt: 2 }}>Price: ${selectedRentVehicle.price}/day</Typography>
+            </Box>
+        )}
         {/* Rent Page Header */}
         <Typography variant="h3" sx={{ fontWeight: 'bold', mb: 3, color: '#2E3B4E' }}>
             Complete Your Rental Booking
@@ -657,7 +668,7 @@ export default function MyApp() {
 
 
 
-            {showVehicles && <VehicleList username={username} />}
+{showVehicles && <VehicleList username={username} runShowRent={runShowRent} />}
             {showContact && (
                 <Box sx={{ p: 4, textAlign: 'center', backgroundColor: 'white', borderRadius: '10px' }}>
                     <Typography variant="h3">Contact</Typography>
