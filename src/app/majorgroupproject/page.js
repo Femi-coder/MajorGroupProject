@@ -244,12 +244,12 @@ export default function MyApp() {
     return (
         <Box
     sx={{
-        position: 'relative', // Change from absolute to relative
+        position: 'relative',
         width: '100vw',
         minHeight: '100vh', // Ensure full height
         backgroundColor: '#2E3B4E',
         color: 'lightgreen',
-        overflowY: 'auto', // ✅ Enables vertical scrolling
+        overflowY: 'auto', // Enables vertical scrolling
         display: 'flex',
         flexDirection: 'column',
     }}
@@ -612,59 +612,65 @@ export default function MyApp() {
                 </Box>
             )}
 
-{showRent && (
+{showRent && selectedRentVehicle && (
     <Box
         sx={{
-            p: 4,
-            textAlign: 'center',
-            backgroundColor: 'white',
-            borderRadius: '10px',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-            maxWidth: '50%',
-            margin: 'auto',
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "100vh",
+            backgroundColor: "#2E3B4E",
+            padding: "20px",
         }}
     >
-        {selectedRentVehicle && (
-            <Box sx={{ mb: 3 }}>
-                <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2, color: "#2E3B4E" }}>
-                    {selectedRentVehicle.make} {selectedRentVehicle.model} ({selectedRentVehicle.year})
-                </Typography>
-                <img src={selectedRentVehicle.image} alt={selectedRentVehicle.model} style={{ width: "100%", borderRadius: "10px" }} />
-                <Typography variant="h6" sx={{ mt: 2 }}>Price: ${selectedRentVehicle.price}/day</Typography>
+        <Box
+            sx={{
+                width: "90%",
+                maxWidth: "600px",
+                backgroundColor: "white",
+                borderRadius: "10px",
+                padding: "20px",
+                boxShadow: "0 4px 10px rgba(0,0,0,0.2)", // Softer shadow
+                textAlign: "center",
+            }}
+        >
+            <Typography variant="h4" sx={{ fontWeight: "bold", color: "#2E3B4E", mb: 2 }}>
+                {selectedRentVehicle.make} {selectedRentVehicle.model} ({selectedRentVehicle.year})
+            </Typography>
+            <img 
+                src={selectedRentVehicle.image} 
+                alt={selectedRentVehicle.model} 
+                style={{ width: "100%", borderRadius: "10px", marginBottom: "20px" }} 
+            />
+            <Typography variant="h5" sx={{ fontWeight: "bold", color: "#2E3B4E", mb: 1 }}>
+                Price: ${selectedRentVehicle.price}/day
+            </Typography>
+
+            {/* Rental Form */}
+            <Box component="form" sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                <TextField label="Pickup Location" variant="outlined" required fullWidth />
+                <TextField label="Drop-off Location" variant="outlined" required fullWidth />
+                <TextField label="Rental Start Date" type="date" InputLabelProps={{ shrink: true }} required fullWidth />
+                <TextField label="Rental End Date" type="date" InputLabelProps={{ shrink: true }} required fullWidth />
+
+                <Button
+                    variant="contained"
+                    sx={{
+                        backgroundColor: "#2E3B4E",
+                        color: "white",
+                        fontWeight: "bold",
+                        padding: "10px",
+                        borderRadius: "5px",
+                        mt: 2,
+                    }}
+                >
+                    Confirm Your Booking
+                </Button>
             </Box>
-        )}
-        {/* Rent Page Header */}
-        <Typography variant="h3" sx={{ fontWeight: 'bold', mb: 3, color: '#2E3B4E' }}>
-            Complete Your Rental Booking
-        </Typography>
-        <Typography variant="body1" sx={{ mb: 4, color: '#555' }}>
-            Please fill in the details below to complete your rental.
-        </Typography>
-
-        {/* Rental Form */}
-        <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <TextField label="Pickup Location" variant="outlined" required fullWidth />
-            <TextField label="Drop-off Location" variant="outlined" required fullWidth />
-            <TextField label="Rental Start Date" type="date" InputLabelProps={{ shrink: true }} required fullWidth />
-            <TextField label="Rental End Date" type="date" InputLabelProps={{ shrink: true }} required fullWidth />
-
-            {/* Submit Button */}
-            <Button
-                variant="contained"
-                sx={{
-                    backgroundColor: '#2E3B4E',
-                    color: 'white',
-                    fontWeight: 'bold',
-                    p: 1.5,
-                    borderRadius: '5px',
-                    mt: 3,
-                }}
-            >
-                Confirm Your Booking
-            </Button>
         </Box>
     </Box>
 )}
+
 
 
 
