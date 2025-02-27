@@ -11,9 +11,11 @@ import Typography from '@mui/joy/Typography';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
+import axios from "axios";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import VehicleList from '../api/VehicleList/VehicleList.js';
+
 
 export default function MyApp() {
     const [loggedIn, setLoggedIn] = useState(false);
@@ -30,6 +32,9 @@ export default function MyApp() {
     const [userEmail, setUserEmail] = useState('');
     const [studentShareRegistered, setStudentShareRegistered] = useState(false);
     const [studentShareDetails, setStudentShareDetails] = useState(null);
+    const [selectedRentVehicle, setSelectedRentVehicle] = useState(null);
+    const [reviews, setReviews] = useState([]);
+    const [formData, setFormData] = useState({ name: "", vehicle: "", rating: "", comment: "" });
 
 
 
@@ -71,6 +76,11 @@ export default function MyApp() {
     };
 
     const runShowMapApi = () => {
+        if (!loggedIn) {
+            alert("You must be logged in to access the Map API.");
+            runShowLogin();
+            return;
+        }
         resetPages();
         setShowMapApi(true);
     };
@@ -80,18 +90,33 @@ export default function MyApp() {
         setShowReviews(true);
     };
 
-    const runShowRent = () => {
+    const runShowRent = (vehicle = null) => {
+        if (!loggedIn) {
+            alert("You must be logged in to access the Rent page.");
+            runShowLogin();
+            return;
+        }
+        setSelectedRentVehicle(vehicle);
         resetPages();
         setShowRent(true);
     };
 
     const runShowContact = () => {
+        if (!loggedIn) {
+            alert("You must be logged in to access the Contact Page.");
+            return;
+        }
         resetPages();
         setShowContact(true);
     };
 
     const runShowVehicles = () => {
-        resetPages(); // Ensure all other sections are hidden
+        if (!loggedIn) {
+            alert("You must be logged in to access the Vehicles Page.");
+            runShowLogin();
+            return;
+        }
+        resetPages();
         setShowVehicles(true);
     };
     
@@ -121,7 +146,49 @@ export default function MyApp() {
                 }
             })
             .catch((err) => console.error('Error during login:', err));
+
+
     };
+    useEffect(() => {
+        axios.get("http://127.0.0.1:5000/api/reviews")
+            .then(response => setReviews(response.data))
+            .catch(error => console.error("Error fetching reviews:", error));
+    }, []);
+    // Handle input changes
+const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+};
+
+// Submit a new review
+const handleSubmit = (e) => {
+    e.preventDefault();
+
+    fetch("http://127.0.0.1:5000/api/reviews", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            name: formData.name,
+            vehicle: formData.vehicle,
+            rating: formData.rating,
+            comment: formData.comment
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Review added:", data);
+        if (data.message) {
+            alert("Review submitted successfully!");
+            setReviews([...reviews, formData]);
+            setFormData({ name: "", vehicle: "", rating: "", comment: "" });
+        } else {
+            alert("Error: " + data.error);
+        }
+    })
+    .catch(error => console.error("Error adding review:", error));
+};
+
     const handleLogout = () => {
         setLoggedIn(false);
         setUsername('');
@@ -224,12 +291,12 @@ export default function MyApp() {
     return (
         <Box
     sx={{
-        position: 'relative', // Change from absolute to relative
+        position: 'relative',
         width: '100vw',
         minHeight: '100vh', // Ensure full height
         backgroundColor: '#2E3B4E',
         color: 'lightgreen',
-        overflowY: 'auto', // ✅ Enables vertical scrolling
+        overflowY: 'auto', // Enables vertical scrolling
         display: 'flex',
         flexDirection: 'column',
     }}
@@ -585,58 +652,116 @@ export default function MyApp() {
                 </Box>
             )}
 
-            {showReviews && (
-                <Box sx={{ p: 4, textAlign: 'center', backgroundColor: 'white', borderRadius: '10px' }}>
-                    <Typography variant="h3">Reviews</Typography>
-                    <Typography>Page under construction</Typography>
-                </Box>
-            )}
-
-{showRent && (
-    <Box
-        sx={{
-            p: 4,
-            textAlign: 'center',
-            backgroundColor: 'white',
-            borderRadius: '10px',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-            maxWidth: '50%',
-            margin: 'auto',
+{showReviews && (
+    <Box 
+        sx={{ 
+            p: 4, 
+            textAlign: "center", 
+            backgroundColor: "white", 
+            borderRadius: "10px", 
+            boxShadow: "0 4px 6px rgba(0,0,0,0.1)", 
+            maxWidth: "800px", 
+            margin: "auto" 
         }}
     >
-        {/* Rent Page Header */}
-        <Typography variant="h3" sx={{ fontWeight: 'bold', mb: 3, color: '#2E3B4E' }}>
-            Complete Your Rental Booking
-        </Typography>
-        <Typography variant="body1" sx={{ mb: 4, color: '#555' }}>
-            Please fill in the details below to complete your rental.
+        <Typography variant="h3" sx={{ color: "#2E3B4E", fontWeight: "bold", mb: 3 }}>
+            Vehicle Reviews
         </Typography>
 
-        {/* Rental Form */}
-        <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <TextField label="Renter ID" variant="outlined" required fullWidth />
-            <TextField label="Pickup Location" variant="outlined" required fullWidth />
-            <TextField label="Drop-off Location" variant="outlined" required fullWidth />
-            <TextField label="Rental Start Date" type="date" InputLabelProps={{ shrink: true }} required fullWidth />
-            <TextField label="Rental End Date" type="date" InputLabelProps={{ shrink: true }} required fullWidth />
+        {/* Fetch and Display Reviews */}
+        {reviews.length > 0 ? (
+            reviews.map((review, index) => (
+                <Box 
+                    key={index} 
+                    sx={{ 
+                        backgroundColor: "#f5f5f5", 
+                        padding: 3, 
+                        borderRadius: "10px", 
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.1)", 
+                        mb: 2 
+                    }}
+                >
+                    <Typography variant="h5" sx={{ fontWeight: "bold", color: "#2E3B4E" }}>
+                        {review.vehicle} - ⭐ {review.rating}/5
+                    </Typography>
+                    <Typography variant="body1" sx={{ color: "#555", fontStyle: "italic" }}>
+                        "{review.comment}"
+                    </Typography>
+                    <Typography variant="caption" sx={{ display: "block", color: "gray" }}>
+                        - {review.name}
+                    </Typography>
+                </Box>
+            ))
+        ) : (
+            <Typography variant="body1" sx={{ color: "#555", fontStyle: "italic" }}>
+                No reviews yet. Be the first to review!
+            </Typography>
+        )}
 
-            {/* Submit Button */}
-            <Button
-                variant="contained"
-                sx={{
-                    backgroundColor: '#2E3B4E',
-                    color: 'white',
-                    fontWeight: 'bold',
-                    p: 1.5,
-                    borderRadius: '5px',
-                    mt: 3,
-                }}
+        {/* Review Form */}
+        <Box 
+            component="form" 
+            sx={{ mt: 4, textAlign: "left" }} 
+            onSubmit={handleSubmit}
+        >
+            <Typography variant="h4" sx={{ fontWeight: "bold", color: "#2E3B4E", mb: 2 }}>
+                Submit Your Review
+            </Typography>
+            
+            <TextField 
+                label="Your Name" 
+                variant="outlined" 
+                name="name" 
+                value={formData.name} 
+                onChange={handleChange} 
+                required 
+                fullWidth 
+                sx={{ mb: 2 }} 
+            />
+            <TextField 
+                label="Vehicle Name" 
+                variant="outlined" 
+                name="vehicle" 
+                value={formData.vehicle} 
+                onChange={handleChange} 
+                required 
+                fullWidth 
+                sx={{ mb: 2 }} 
+            />
+            <TextField 
+                label="Rating (1-5)" 
+                variant="outlined" 
+                name="rating" 
+                type="number" 
+                value={formData.rating} 
+                onChange={handleChange} 
+                required 
+                fullWidth 
+                sx={{ mb: 2 }} 
+            />
+            <TextField 
+                label="Write your review..." 
+                variant="outlined" 
+                name="comment" 
+                value={formData.comment} 
+                onChange={handleChange} 
+                multiline 
+                rows={3} 
+                required 
+                fullWidth 
+                sx={{ mb: 2 }} 
+            />
+            <Button 
+                type="submit" 
+                variant="contained" 
+                sx={{ backgroundColor: "#2E3B4E", color: "white", ":hover": { backgroundColor: "#4C5E72" } }}
             >
-                Confirm Your Booking
+                Submit Review
             </Button>
         </Box>
     </Box>
 )}
+
 
 
 {showContact && (
@@ -715,6 +840,77 @@ export default function MyApp() {
 )}
 
 
+
+=======
+{showRent && selectedRentVehicle && (
+    <Box
+        sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "100vh",
+            backgroundColor: "#2E3B4E",
+            padding: "20px",
+        }}
+    >
+        <Box
+            sx={{
+                width: "90%",
+                maxWidth: "600px",
+                backgroundColor: "white",
+                borderRadius: "10px",
+                padding: "20px",
+                boxShadow: "0 4px 10px rgba(0,0,0,0.2)", // Softer shadow
+                textAlign: "center",
+            }}
+        >
+            <Typography variant="h4" sx={{ fontWeight: "bold", color: "#2E3B4E", mb: 2 }}>
+                {selectedRentVehicle.make} {selectedRentVehicle.model} ({selectedRentVehicle.year})
+            </Typography>
+            <img 
+                src={selectedRentVehicle.image} 
+                alt={selectedRentVehicle.model} 
+                style={{ width: "100%", borderRadius: "10px", marginBottom: "20px" }} 
+            />
+            <Typography variant="h5" sx={{ fontWeight: "bold", color: "#2E3B4E", mb: 1 }}>
+                Price: ${selectedRentVehicle.price}/day
+            </Typography>
+
+            {/* Rental Form */}
+            <Box component="form" sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                <TextField label="Pickup Location" variant="outlined" required fullWidth />
+                <TextField label="Drop-off Location" variant="outlined" required fullWidth />
+                <TextField label="Rental Start Date" type="date" InputLabelProps={{ shrink: true }} required fullWidth />
+                <TextField label="Rental End Date" type="date" InputLabelProps={{ shrink: true }} required fullWidth />
+
+                <Button
+                    variant="contained"
+                    sx={{
+                        backgroundColor: "#2E3B4E",
+                        color: "white",
+                        fontWeight: "bold",
+                        padding: "10px",
+                        borderRadius: "5px",
+                        mt: 2,
+                    }}
+                >
+                    Confirm Your Booking
+                </Button>
+            </Box>
+        </Box>
+    </Box>
+)}
+
+
+
+
+{showVehicles && <VehicleList username={username} runShowRent={runShowRent} />}
+            {showContact && (
+                <Box sx={{ p: 4, textAlign: 'center', backgroundColor: 'white', borderRadius: '10px' }}>
+                    <Typography variant="h3">Contact</Typography>
+                    <Typography>Page under construction</Typography>
+                </Box>
+            )}
 
         </Box>
     );

@@ -1,4 +1,5 @@
 import { MongoClient } from 'mongodb';
+import { v4 as uuidv4 } from 'uuid';
 
 export async function POST(req) {
     console.log("In the registration API");
@@ -37,13 +38,15 @@ export async function POST(req) {
             console.log("Validation failed: Email already registered");
             return new Response(JSON.stringify({ error: "Email already registered" }), { status: 400 });
         }
+        const rentalID = uuidv4(); 
 
         // Save the user to the database
         const newUser = {
             name,
             address,
             email,
-            password, // In production, hash the password before saving
+            password,
+            rentalID
         };
 
         const insertResult = await usersCollection.insertOne(newUser);
