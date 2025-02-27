@@ -10,9 +10,11 @@ import Typography from '@mui/joy/Typography';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
+import axios from "axios";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import VehicleList from '../api/VehicleList/VehicleList.js';
+
 
 export default function MyApp() {
     const [loggedIn, setLoggedIn] = useState(false);
@@ -30,6 +32,8 @@ export default function MyApp() {
     const [studentShareRegistered, setStudentShareRegistered] = useState(false);
     const [studentShareDetails, setStudentShareDetails] = useState(null);
     const [selectedRentVehicle, setSelectedRentVehicle] = useState(null);
+    const [reviews, setReviews] = useState([]);
+    const [formData, setFormData] = useState({ name: "", vehicle: "", rating: "", comment: "" });
 
 
 
@@ -141,7 +145,49 @@ export default function MyApp() {
                 }
             })
             .catch((err) => console.error('Error during login:', err));
+
+
     };
+    useEffect(() => {
+        axios.get("http://127.0.0.1:5000/api/reviews")
+            .then(response => setReviews(response.data))
+            .catch(error => console.error("Error fetching reviews:", error));
+    }, []);
+    // Handle input changes
+const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+};
+
+// Submit a new review
+const handleSubmit = (e) => {
+    e.preventDefault();
+
+    fetch("http://127.0.0.1:5000/api/reviews", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            name: formData.name,
+            vehicle: formData.vehicle,
+            rating: formData.rating,
+            comment: formData.comment
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Review added:", data);
+        if (data.message) {
+            alert("Review submitted successfully!");
+            setReviews([...reviews, formData]);
+            setFormData({ name: "", vehicle: "", rating: "", comment: "" });
+        } else {
+            alert("Error: " + data.error);
+        }
+    })
+    .catch(error => console.error("Error adding review:", error));
+};
+
     const handleLogout = () => {
         setLoggedIn(false);
         setUsername('');
@@ -605,12 +651,116 @@ export default function MyApp() {
                 </Box>
             )}
 
-            {showReviews && (
-                <Box sx={{ p: 4, textAlign: 'center', backgroundColor: 'white', borderRadius: '10px' }}>
-                    <Typography variant="h3">Reviews</Typography>
-                    <Typography>Page under construction</Typography>
+{showReviews && (
+    <Box 
+        sx={{ 
+            p: 4, 
+            textAlign: "center", 
+            backgroundColor: "white", 
+            borderRadius: "10px", 
+            boxShadow: "0 4px 6px rgba(0,0,0,0.1)", 
+            maxWidth: "800px", 
+            margin: "auto" 
+        }}
+    >
+        <Typography variant="h3" sx={{ color: "#2E3B4E", fontWeight: "bold", mb: 3 }}>
+            Vehicle Reviews
+        </Typography>
+
+        {/* Fetch and Display Reviews */}
+        {reviews.length > 0 ? (
+            reviews.map((review, index) => (
+                <Box 
+                    key={index} 
+                    sx={{ 
+                        backgroundColor: "#f5f5f5", 
+                        padding: 3, 
+                        borderRadius: "10px", 
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.1)", 
+                        mb: 2 
+                    }}
+                >
+                    <Typography variant="h5" sx={{ fontWeight: "bold", color: "#2E3B4E" }}>
+                        {review.vehicle} - ⭐ {review.rating}/5
+                    </Typography>
+                    <Typography variant="body1" sx={{ color: "#555", fontStyle: "italic" }}>
+                        "{review.comment}"
+                    </Typography>
+                    <Typography variant="caption" sx={{ display: "block", color: "gray" }}>
+                        - {review.name}
+                    </Typography>
                 </Box>
-            )}
+            ))
+        ) : (
+            <Typography variant="body1" sx={{ color: "#555", fontStyle: "italic" }}>
+                No reviews yet. Be the first to review!
+            </Typography>
+        )}
+
+        {/* Review Form */}
+        <Box 
+            component="form" 
+            sx={{ mt: 4, textAlign: "left" }} 
+            onSubmit={handleSubmit}
+        >
+            <Typography variant="h4" sx={{ fontWeight: "bold", color: "#2E3B4E", mb: 2 }}>
+                Submit Your Review
+            </Typography>
+            
+            <TextField 
+                label="Your Name" 
+                variant="outlined" 
+                name="name" 
+                value={formData.name} 
+                onChange={handleChange} 
+                required 
+                fullWidth 
+                sx={{ mb: 2 }} 
+            />
+            <TextField 
+                label="Vehicle Name" 
+                variant="outlined" 
+                name="vehicle" 
+                value={formData.vehicle} 
+                onChange={handleChange} 
+                required 
+                fullWidth 
+                sx={{ mb: 2 }} 
+            />
+            <TextField 
+                label="Rating (1-5)" 
+                variant="outlined" 
+                name="rating" 
+                type="number" 
+                value={formData.rating} 
+                onChange={handleChange} 
+                required 
+                fullWidth 
+                sx={{ mb: 2 }} 
+            />
+            <TextField 
+                label="Write your review..." 
+                variant="outlined" 
+                name="comment" 
+                value={formData.comment} 
+                onChange={handleChange} 
+                multiline 
+                rows={3} 
+                required 
+                fullWidth 
+                sx={{ mb: 2 }} 
+            />
+            <Button 
+                type="submit" 
+                variant="contained" 
+                sx={{ backgroundColor: "#2E3B4E", color: "white", ":hover": { backgroundColor: "#4C5E72" } }}
+            >
+                Submit Review
+            </Button>
+        </Box>
+    </Box>
+)}
+
 
 {showRent && selectedRentVehicle && (
     <Box
