@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -638,14 +639,83 @@ export default function MyApp() {
 )}
 
 
+{showContact && (
+    <Box
+        sx={{
+            p: 5,
+            textAlign: 'center',
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            boxShadow: '0 6px 12px rgba(0,0,0,0.15)',
+            maxWidth: '600px',
+            margin: 'auto',
+            mt: 5,
+        }}
+    >
+        <Typography variant="h3" sx={{ fontWeight: 'bold', mb: 2, color: '#2E3B4E' }}>
+            Contact Us
+        </Typography>
+        <Typography variant="body1" sx={{ mb: 4, color: '#555' }}>
+            Have any questions? Fill in the form below and we’ll get back to you as soon as possible.
+        </Typography>
 
-            {showVehicles && <VehicleList username={username} />}
-            {showContact && (
-                <Box sx={{ p: 4, textAlign: 'center', backgroundColor: 'white', borderRadius: '10px' }}>
-                    <Typography variant="h3">Contact</Typography>
-                    <Typography>Page under construction</Typography>
-                </Box>
-            )}
+        {/* Contact Form */}
+        <Box
+            component="form"
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2.5,
+                textAlign: 'left',
+            }}
+            onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const name = formData.get('name').trim();
+                const email = formData.get('email').trim();
+                const phone = formData.get('phone').trim();
+                const subject = formData.get('subject').trim();
+                const message = formData.get('message').trim();
+
+                if (!name || !email || !phone || !subject || !message) {
+                    alert('Please fill in all fields before submitting.');
+                    return;
+                }
+
+                alert('Message sent successfully!');
+                e.target.reset();
+            }}
+        >
+            <TextField label="Full Name" name="name" variant="outlined" required fullWidth />
+            <TextField label="Email Address" name="email" type="email" variant="outlined" required fullWidth />
+            <TextField label="Phone Number" name="phone" type="tel" variant="outlined" required fullWidth />
+            <TextField label="Subject" name="subject" variant="outlined" required fullWidth />
+            <TextField label="Message" name="message" multiline rows={4} variant="outlined" required fullWidth />
+
+            {/* Submit Button */}
+            <Button
+                type="submit"
+                variant="contained"
+                sx={{
+                    backgroundColor: '#2E3B4E',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    p: 1.5,
+                    borderRadius: '5px',
+                    mt: 2,
+                    ':hover': {
+                        backgroundColor: '#4C5E72',
+                    },
+                }}
+            >
+                Send Message
+            </Button>
+        </Box>
+    </Box>
+)}
+
+
+
         </Box>
     );
 }
