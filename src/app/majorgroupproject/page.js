@@ -904,12 +904,7 @@ const handleSubmit = (e) => {
 
 
 {showVehicles && <VehicleList username={username} runShowRent={runShowRent} />}
-            {showContact && (
-                <Box sx={{ p: 4, textAlign: 'center', backgroundColor: 'white', borderRadius: '10px' }}>
-                    <Typography variant="h3">Contact</Typography>
-                    <Typography>Page under construction</Typography>
-                </Box>
-            )}
+            
 
         </Box>
     );
