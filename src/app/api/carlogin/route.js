@@ -1,4 +1,5 @@
  import { MongoClient } from 'mongodb';
+ import bcrypt from 'bcryptjs';
 
 export async function POST(req) {
     try {
