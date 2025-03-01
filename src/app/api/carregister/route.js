@@ -1,5 +1,6 @@
 import { MongoClient } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
+import bcrypt from 'bcryptjs';
 
 export async function POST(req) {
     console.log("In the registration API");
@@ -40,12 +41,17 @@ export async function POST(req) {
         }
         const rentalID = uuidv4(); 
 
+        //Encypt the users password with bcrypt
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+
         // Save the user to the database
         const newUser = {
             name,
             address,
             email,
-            password,
+            password: hashedPassword,
             rentalID
         };
 

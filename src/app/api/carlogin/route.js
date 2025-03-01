@@ -13,7 +13,6 @@ export async function POST(req) {
         }
 
         console.log("Received email:", email);
-        console.log("Received password:", password);
 
         // Connect to MongoDB
         const uri = 'mongodb+srv://Femi:password_123@ecowheelsdublin.zpsyu.mongodb.net';
@@ -33,8 +32,10 @@ export async function POST(req) {
             return new Response(JSON.stringify({ error: "User not found" }), { status: 404 });
         }
 
+        const passwordMatch = await bcrypt.compare(password, user.password);
+
         // Validate password
-        if (user.password !== password) {
+        if (!passwordMatch) {
             console.error("Password mismatch for email:", email);
             return new Response(JSON.stringify({ error: "Invalid credentials" }), { status: 401 });
         }
