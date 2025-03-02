@@ -1,62 +1,64 @@
 from flask import Flask, request, jsonify
-from flask_restful import Resource, Api
+from flask_cors import CORS
 import pymongo
-from bson import ObjectId
 import os
-from dotenv import load_dotenv
-from transaction import TransactionSystem, TransactionType
+import uuid
+from datetime import datetime
 
-# Load environment variables
-load_dotenv()
-
+# Initialize Flask App
 app = Flask(__name__)
-api = Api(app)
+CORS(app)  # Enable CORS for all routes
 
-# MongoDB Connection
+# MongoDB Configuration
 MONGO_URI = os.getenv("MONGODB_ATLAS_URI", "mongodb+srv://Femi:password_123@ecowheelsdublin.zpsyu.mongodb.net")
 client = pymongo.MongoClient(MONGO_URI)
 db = client["carrental"]
-rentals_collection = db["rentals"]
-vehicles_collection = db["vehicles"]
+transactions_collection = db["transactions"]
 
-# Initialize Transaction System
-transaction_system = TransactionSystem()
-
-class Rent(Resource):
-    def post(self):
-        """Handles car rentals by creating a transaction for the rental."""
+# ✅ Route to process a new transaction
+@app.route("/api/transactions", methods=["POST"])
+def process_transaction():
+    try:
         data = request.get_json()
-        user_id = data.get('user_id')
-        rental_id = data.get('rental_id')
-        amount = data.get('amount', 50)  # Default rental fee
+        user_id = data.get("user_id")
+        amount = data.get("amount")
+        pickup = data.get("pickup")
+        dropoff = data.get("dropoff")
+        start = data.get("start")
+        end = data.get("end")
 
-        if not user_id or not rental_id:
-            return jsonify({"error": "Missing required parameters"}), 400
+        if not user_id or not amount:
+            return jsonify({"error": "Missing required transaction details"}), 400
 
-        # Create a transaction for the rental
-        transaction_id = transaction_system.create_transaction(user_id, rental_id, float(amount), TransactionType.RENTAL_PAYMENT)
+        new_transaction = {
+            "transaction_id": str(uuid.uuid4()),
+            "user_id": user_id,
+            "amount": float(amount),
+            "pickup": pickup,
+            "dropoff": dropoff,
+            "start": start,
+            "end": end,
+            "status": "completed",
+            "created_at": datetime.utcnow(),
+        }
 
-        return jsonify({
-            "status": "success",
-            "transaction_id": transaction_id,
-            "message": "Transaction created successfully"
-        }), 201
+        transactions_collection.insert_one(new_transaction)
 
-api.add_resource(Rent, '/api/rent')
+        return jsonify({"message": "Transaction successful!", "transaction_id": new_transaction["transaction_id"]}), 201
 
-class ProcessTransaction(Resource):
-    def get(self, transaction_id):
-        """Fetch details of a transaction."""
-        try:
-            transaction = transaction_system.get_transaction(transaction_id)
-            return jsonify({
-                "status": "success",
-                "transaction": transaction
-            }), 200
-        except ValueError as e:
-            return jsonify({"error": str(e)}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-api.add_resource(ProcessTransaction, '/api/transactions/<string:transaction_id>')
+# ✅ Route to fetch a transaction
+@app.route("/api/transactions/<transaction_id>", methods=["GET"])
+def get_transaction(transaction_id):
+    try:
+        transaction = transactions_collection.find_one({"transaction_id": transaction_id}, {"_id": 0})
+        if not transaction:
+            return jsonify({"error": "Transaction not found"}), 404
+        return jsonify({"status": "success", "transaction": transaction}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True, port=5000)

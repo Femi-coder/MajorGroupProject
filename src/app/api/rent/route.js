@@ -8,11 +8,10 @@ export async function POST(req) {
 
     try {
         const body = await req.json();
-        let { carId } = body;
+        let { carId, pickup, dropoff, start, end } = body;  // ✅ Include rental details
 
         console.log("Received rental request for vehicle:", carId);
 
-        // ✅ Convert `carId` to a number
         carId = parseInt(carId, 10);
         if (isNaN(carId)) {
             console.error("Invalid vehicle ID format");
@@ -24,7 +23,6 @@ export async function POST(req) {
         const db = client.db(DB_NAME);
         const vehiclesCollection = db.collection("vehicles");
 
-        // ✅ Find vehicle using `carId`
         const vehicle = await vehiclesCollection.findOne({ carId: carId });
         if (!vehicle) {
             console.error("Vehicle not found:", carId);
@@ -35,21 +33,23 @@ export async function POST(req) {
             return new Response(JSON.stringify({ error: "Vehicle already rented" }), { status: 400 });
         }
 
-        // ✅ Update availability
-        const updateResult = await vehiclesCollection.updateOne(
-            { carId: carId },
-            { $set: { availability: false } }
-        );
+        // ✅ Store rental info in a new collection
+        const rentalsCollection = db.collection("rentals");
+        const rentalData = {
+            carId: carId,
+            pickup: pickup,
+            dropoff: dropoff,
+            start: start,
+            end: end,
+            rentedAt: new Date(),
+            status: "pending"
+        };
+        const rentalResponse = await rentalsCollection.insertOne(rentalData);
 
-        console.log("MongoDB update result:", updateResult);
-
+        await vehiclesCollection.updateOne({ carId: carId }, { $set: { availability: false } });
         await client.close();
 
-        if (updateResult.modifiedCount === 0) {
-            return new Response(JSON.stringify({ error: "Failed to rent vehicle" }), { status: 500 });
-        }
-
-        return new Response(JSON.stringify({ message: "Vehicle rented successfully!" }), { status: 200 });
+        return new Response(JSON.stringify({ message: "Vehicle rented successfully!", rentalId: rentalResponse.insertedId }), { status: 200 });
     } catch (error) {
         console.error("Error in API:", error);
         return new Response(JSON.stringify({ error: "Internal server error" }), { status: 500 });

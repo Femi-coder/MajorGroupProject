@@ -12,12 +12,14 @@ import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import axios from "axios";
+import { useRouter } from 'next/navigation';
 
 import { useState, useEffect } from 'react';
 import VehicleList from '../api/VehicleList/VehicleList.js';
 
 
 export default function MyApp() {
+    const router = useRouter()
     const [loggedIn, setLoggedIn] = useState(false);
     const [showFirstPage, setShowFirstPage] = useState(true);
     const [showRegister, setShowRegister] = useState(false);
@@ -35,7 +37,10 @@ export default function MyApp() {
     const [selectedRentVehicle, setSelectedRentVehicle] = useState(null);
     const [reviews, setReviews] = useState([]);
     const [formData, setFormData] = useState({ name: "", vehicle: "", rating: "", comment: "" });
-
+    const [pickup, setPickup] = useState('');
+    const [dropoff, setDropoff] = useState('');
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
 
 
     const resetPages = () => {
@@ -97,7 +102,6 @@ export default function MyApp() {
             return;
         }
         setSelectedRentVehicle(vehicle);
-        router.push(`/transaction?vehicleId=${vehicle.id}&price=${vehicle.price}`);
         resetPages();
         setShowRent(true);
     };
@@ -188,6 +192,46 @@ const handleSubmit = (e) => {
         }
     })
     .catch(error => console.error("Error adding review:", error));
+};
+const handleConfirmBooking = async () => {
+    if (!selectedRentVehicle || !pickup || !dropoff || !startDate || !endDate) {
+        alert("Please fill in all details!");
+        return;
+    }
+
+    try {
+        const user_id = localStorage.getItem("user_id") || "test_user"; 
+
+        const response = await fetch("http://127.0.0.1:5000/api/transactions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                user_id:  "test_user",
+                vehicle_id: selectedRentVehicle._id,
+                amount: selectedRentVehicle.price,
+                pickup,
+                dropoff,
+                start: startDate,
+                end: endDate
+            }),
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            alert("Booking Confirmed! Redirecting to Transaction Summary...");
+            
+            // Navigate to transaction page with details
+            router.push(
+                `/transaction?vehicleId=${encodeURIComponent(selectedRentVehicle._id)}&price=${encodeURIComponent(selectedRentVehicle.price)}&pickup=${encodeURIComponent(pickup)}&dropoff=${encodeURIComponent(dropoff)}&start=${encodeURIComponent(startDate)}&end=${encodeURIComponent(endDate)}&transactionId=${encodeURIComponent(data.transaction_id)}`
+            );
+        } else {
+            alert(`Transaction Failed: ${data.error}`);
+        }
+    } catch (error) {
+        alert(`Error: ${error.message}`);
+    }
 };
 
     const handleLogout = () => {
@@ -878,24 +922,24 @@ const handleSubmit = (e) => {
 
             {/* Rental Form */}
             <Box component="form" sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                <TextField label="Pickup Location" variant="outlined" required fullWidth />
-                <TextField label="Drop-off Location" variant="outlined" required fullWidth />
-                <TextField label="Rental Start Date" type="date" InputLabelProps={{ shrink: true }} required fullWidth />
-                <TextField label="Rental End Date" type="date" InputLabelProps={{ shrink: true }} required fullWidth />
+            <TextField label="Pickup Location" variant="outlined" value={pickup} onChange={(e) => setPickup(e.target.value)} required fullWidth sx={{ mb: 2 }} />
+            <TextField label="Drop-off Location" variant="outlined" value={dropoff} onChange={(e) => setDropoff(e.target.value)} required fullWidth sx={{ mb: 2 }} />
+            <TextField label="Rental Start Date" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required fullWidth sx={{ mb: 2 }} />
+            <TextField label="Rental End Date" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} required fullWidth sx={{ mb: 2 }} />
+     <Button variant="contained"
+    sx={{
+        backgroundColor: "#2E3B4E",
+        color: "white",
+        fontWeight: "bold",
+        padding: "10px",
+        borderRadius: "5px",
+        mt: 2,
+    }}
+    onClick={handleConfirmBooking}
+>
+    Confirm Your Booking
+</Button>
 
-                <Button
-                    variant="contained"
-                    sx={{
-                        backgroundColor: "#2E3B4E",
-                        color: "white",
-                        fontWeight: "bold",
-                        padding: "10px",
-                        borderRadius: "5px",
-                        mt: 2,
-                    }}
-                >
-                    Confirm Your Booking
-                </Button>
             </Box>
         </Box>
     </Box>
