@@ -95,3 +95,5 @@ const MapComponent = () => {
 };
 
 export default MapComponent;
+
+//npm install maplibre-gl @maptiler/sdk axios
