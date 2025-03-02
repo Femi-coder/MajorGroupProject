@@ -97,6 +97,7 @@ export default function MyApp() {
             return;
         }
         setSelectedRentVehicle(vehicle);
+        router.push(`/transaction?vehicleId=${vehicle.id}&price=${vehicle.price}`);
         resetPages();
         setShowRent(true);
     };
