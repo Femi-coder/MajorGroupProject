@@ -145,7 +145,7 @@ export default function MyApp() {
                 alert('Login successful!');
                 setLoggedIn(true);
                 setUserEmail(email);
-                setUsername(data.username || 'User');  // ✅ Update username in state
+                setUsername(data.username || 'User');  // ✅ Updates username in state
                 localStorage.setItem("user_email", email);  // ✅ Store email in local storage
                 localStorage.setItem("username", data.username || 'User');  // ✅ Store username
                 runShowFirst();
