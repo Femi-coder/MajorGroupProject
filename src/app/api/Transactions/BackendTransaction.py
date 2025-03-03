@@ -18,15 +18,15 @@ MONGO_URI = os.getenv("MONGODB_ATLAS_URI", "mongodb+srv://Femi:password_123@ecow
 client = pymongo.MongoClient(MONGO_URI)
 db = client["carrental"]
 transactions_collection = db["transactions"]
-vehicles_collection = db["vehicles"]  # ✅ Ensure vehicles collection is used to fetch vehicle names
+vehicles_collection = db["vehicles"] 
 
 # ✅ Route to process a new transaction
 @app.route("/api/transactions", methods=["POST"])
 def process_transaction():
     try:
         data = request.get_json()
-        user_name = data.get("user_name")  # ✅ Store username instead of user_id
-        vehicle_id = data.get("vehicle_id")  # ✅ Fetch vehicle by carId
+        user_name = data.get("user_name") 
+        vehicle_id = data.get("vehicle_id")
         amount = data.get("amount")
         pickup = data.get("pickup")
         dropoff = data.get("dropoff")

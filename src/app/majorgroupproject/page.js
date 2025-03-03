@@ -201,7 +201,7 @@ const handleConfirmBooking = async () => {
     }
 
     try {
-        const storedUsername = localStorage.getItem("username") || "Guest";  // ✅ Fetch stored username
+        const storedUsername = localStorage.getItem("username") // Fetch stored username
 
         const response = await fetch("http://127.0.0.1:5000/api/transactions", {
             method: "POST",
@@ -209,9 +209,9 @@ const handleConfirmBooking = async () => {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                user_name: storedUsername,  // ✅ Ensure username is sent
-                vehicle_id: selectedRentVehicle.carId,  // ✅ Use carId instead of _id
-                vehicle_name: `${selectedRentVehicle.make} ${selectedRentVehicle.model}`, // ✅ Send full vehicle name
+                user_name: storedUsername,
+                vehicle_id: selectedRentVehicle.carId,
+                vehicle_name: `${selectedRentVehicle.make} ${selectedRentVehicle.model}`,
                 amount: selectedRentVehicle.price,
                 pickup,
                 dropoff,
