@@ -11,9 +11,15 @@ export default function TransactionPage() {
     const [transaction, setTransaction] = useState(null);
     const [transactionStatus, setTransactionStatus] = useState("Loading...");
 
+    // ✅ Get data from URL parameters
     const transactionId = searchParams.get("transactionId");
-    const userName = searchParams.get("userName") || "Guest";  // ✅ Get username from URL
-    const vehicleName = searchParams.get("vehicleName") || "N/A";  // ✅ Get vehicle name from URL
+    const userName = searchParams.get("userName") || "Guest";  
+    const vehicleName = searchParams.get("vehicleName") || "N/A";  
+    const price = searchParams.get("price") || "N/A";
+    const pickup = searchParams.get("pickup") || "N/A";
+    const dropoff = searchParams.get("dropoff") || "N/A";
+    const start = searchParams.get("start") || "N/A";
+    const end = searchParams.get("end") || "N/A";
 
     useEffect(() => {
         if (!transactionId) return;
@@ -41,19 +47,29 @@ export default function TransactionPage() {
             {transaction ? (
                 <>
                     <Typography variant="h6">
-                        Transaction ID: {transaction.transaction_id}
+                        <strong>Transaction ID:</strong> {transaction.transaction_id}
                     </Typography>
                     <Typography variant="h6">
-                        Hello, {userName}!
+                        <strong>Hello, {userName}!</strong>
                     </Typography>
                     <Typography variant="h6">
-                        Vehicle: {vehicleName}
+                        <strong>Vehicle:</strong> {vehicleName}
                     </Typography>
-                    <Typography variant="h6">Price: ${transaction.amount}</Typography>
-                    <Typography variant="h6">Pickup: {transaction.pickup}</Typography>
-                    <Typography variant="h6">Dropoff: {transaction.dropoff}</Typography>
-                    <Typography variant="h6">Rental Start: {transaction.start}</Typography>
-                    <Typography variant="h6">Rental End: {transaction.end}</Typography>
+                    <Typography variant="h6">
+                        <strong>Price:</strong> ${price}
+                    </Typography>
+                    <Typography variant="h6">
+                        <strong>Pickup:</strong> {pickup}
+                    </Typography>
+                    <Typography variant="h6">
+                        <strong>Dropoff:</strong> {dropoff}
+                    </Typography>
+                    <Typography variant="h6">
+                        <strong>Rental Start:</strong> {start}
+                    </Typography>
+                    <Typography variant="h6">
+                        <strong>Rental End:</strong> {end}
+                    </Typography>
 
                     <Button
                         variant="contained"

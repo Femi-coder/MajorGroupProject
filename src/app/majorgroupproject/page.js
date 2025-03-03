@@ -129,7 +129,7 @@ export default function MyApp() {
     const handleLogin = () => {
         const email = document.querySelector('input[name="email"]').value;
         const password = document.querySelector('input[name="password"]').value;
-
+    
         fetch('/api/carlogin', {
             method: 'POST',
             headers: {
@@ -137,20 +137,21 @@ export default function MyApp() {
             },
             body: JSON.stringify({ email, password }),
         })
-            .then((res) => res.json())
-            .then((data) => {
-                if (data.error) {
-                    alert(data.error);
-                } else {
-                    alert('Login successful!');
-                    setLoggedIn(true);
-                    setUserEmail(email);
-                    setUsername(data.username || 'User');
-                    setStudentShareRegistered(data.studentShareRegistered || false);
-                    runShowFirst();
-                }
-            })
-            .catch((err) => console.error('Error during login:', err));
+        .then((res) => res.json())
+        .then((data) => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                alert('Login successful!');
+                setLoggedIn(true);
+                setUserEmail(email);
+                setUsername(data.username || 'User');  // ✅ Update username in state
+                localStorage.setItem("user_email", email);  // ✅ Store email in local storage
+                localStorage.setItem("username", data.username || 'User');  // ✅ Store username
+                runShowFirst();
+            }
+        })
+        .catch((err) => console.error('Error during login:', err));
 
 
     };
@@ -200,7 +201,7 @@ const handleConfirmBooking = async () => {
     }
 
     try {
-        const storedUsername = localStorage.getItem("username") || "Guest";  
+        const storedUsername = localStorage.getItem("username") || "Guest";  // ✅ Fetch stored username
 
         const response = await fetch("http://127.0.0.1:5000/api/transactions", {
             method: "POST",
@@ -233,7 +234,6 @@ const handleConfirmBooking = async () => {
         alert(`Error: ${error.message}`);
     }
 };
-
 
     const handleLogout = () => {
         setLoggedIn(false);
