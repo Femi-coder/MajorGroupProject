@@ -194,13 +194,13 @@ const handleSubmit = (e) => {
     .catch(error => console.error("Error adding review:", error));
 };
 const handleConfirmBooking = async () => {
-    if (!selectedRentVehicle || !pickup || !dropoff || !startDate || !endDate) {
+    if (!selectedRentVehicle || !selectedRentVehicle.carId || !pickup || !dropoff || !startDate || !endDate) {
         alert("Please fill in all details!");
         return;
     }
 
     try {
-        const user_id = localStorage.getItem("user_id") || "test_user"; 
+        const storedUsername = localStorage.getItem("username") || "Guest";  
 
         const response = await fetch("http://127.0.0.1:5000/api/transactions", {
             method: "POST",
@@ -208,8 +208,9 @@ const handleConfirmBooking = async () => {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                user_id:  "test_user",
-                vehicle_id: selectedRentVehicle._id,
+                user_name: storedUsername,  // ✅ Ensure username is sent
+                vehicle_id: selectedRentVehicle.carId,  // ✅ Use carId instead of _id
+                vehicle_name: `${selectedRentVehicle.make} ${selectedRentVehicle.model}`, // ✅ Send full vehicle name
                 amount: selectedRentVehicle.price,
                 pickup,
                 dropoff,
@@ -221,10 +222,9 @@ const handleConfirmBooking = async () => {
         const data = await response.json();
         if (response.ok) {
             alert("Booking Confirmed! Redirecting to Transaction Summary...");
-            
-            // Navigate to transaction page with details
+
             router.push(
-                `/transaction?vehicleId=${encodeURIComponent(selectedRentVehicle._id)}&price=${encodeURIComponent(selectedRentVehicle.price)}&pickup=${encodeURIComponent(pickup)}&dropoff=${encodeURIComponent(dropoff)}&start=${encodeURIComponent(startDate)}&end=${encodeURIComponent(endDate)}&transactionId=${encodeURIComponent(data.transaction_id)}`
+                `/transaction?userName=${encodeURIComponent(storedUsername)}&vehicleName=${encodeURIComponent(selectedRentVehicle.make + " " + selectedRentVehicle.model)}&price=${encodeURIComponent(selectedRentVehicle.price)}&pickup=${encodeURIComponent(pickup)}&dropoff=${encodeURIComponent(dropoff)}&start=${encodeURIComponent(startDate)}&end=${encodeURIComponent(endDate)}&transactionId=${encodeURIComponent(data.transaction_id)}`
             );
         } else {
             alert(`Transaction Failed: ${data.error}`);
@@ -233,6 +233,7 @@ const handleConfirmBooking = async () => {
         alert(`Error: ${error.message}`);
     }
 };
+
 
     const handleLogout = () => {
         setLoggedIn(false);
@@ -924,8 +925,8 @@ const handleConfirmBooking = async () => {
             <Box component="form" sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             <TextField label="Pickup Location" variant="outlined" value={pickup} onChange={(e) => setPickup(e.target.value)} required fullWidth sx={{ mb: 2 }} />
             <TextField label="Drop-off Location" variant="outlined" value={dropoff} onChange={(e) => setDropoff(e.target.value)} required fullWidth sx={{ mb: 2 }} />
-            <TextField label="Rental Start Date" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required fullWidth sx={{ mb: 2 }} />
-            <TextField label="Rental End Date" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} required fullWidth sx={{ mb: 2 }} />
+            <TextField label="Rental Start Date" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} InputLabelProps={{ shrink: true }} required fullWidth sx={{ mb: 2 }} />
+            <TextField label="Rental End Date" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} InputLabelProps={{ shrink: true }} required fullWidth sx={{ mb: 2 }} />
      <Button variant="contained"
     sx={{
         backgroundColor: "#2E3B4E",
