@@ -147,7 +147,7 @@ export default function MyApp() {
                 setUserEmail(email);
                 setUsername(data.username || 'User');  // ✅ Updates username in state
                 localStorage.setItem("user_email", email);  // ✅ Stores email in local storage
-                localStorage.setItem("username", data.username || 'User');  // ✅ Store username
+                localStorage.setItem("username", data.username || 'User');  // ✅ Stores username
                 runShowFirst();
             }
         })
