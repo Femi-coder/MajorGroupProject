@@ -1,12 +1,12 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 
-export default function TransactionPage() {
+function TransactionContent() {
     const searchParams = useSearchParams();
     const [transaction, setTransaction] = useState(null);
     const [transactionStatus, setTransactionStatus] = useState("Loading...");
@@ -22,7 +22,10 @@ export default function TransactionPage() {
     const end = searchParams.get("end") || "N/A";
 
     useEffect(() => {
-        if (!transactionId) return;
+        if (!transactionId) {
+            setTransactionStatus("Invalid transaction ID.");
+            return;
+        }
 
         fetch(`http://127.0.0.1:5000/api/transactions/${transactionId}`)
             .then((res) => res.json())
@@ -92,5 +95,13 @@ export default function TransactionPage() {
                 </Typography>
             )}
         </Box>
+    );
+}
+
+export default function TransactionPage() {
+    return (
+        <Suspense fallback={<Typography variant="h6">Loading...</Typography>}>
+            <TransactionContent />
+        </Suspense>
     );
 }
