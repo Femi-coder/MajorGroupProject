@@ -55,9 +55,10 @@ def return_car():
         )
 
         # ✅ Make vehicle available again
+        vehicle_id = int(transaction["vehicle_id"])  # Convert vehicle_id to int
         vehicles_collection.update_one(
-            {"carId": int(transaction["vehicle_id"])},
-            {"$set": {"available": True}}
+            {"carId": vehicle_id},
+            {"$set": {"available": True}}  # Set vehicle as available
         )
 
         return jsonify({
