@@ -1,45 +1,40 @@
 from flask import Flask, request, jsonify
-from flask_restful import Resource, Api
-import logging
-from datetime import datetime, timedelta
+from flask_cors import CORS
+from datetime import datetime
 import pymongo
-from bson import ObjectId
 import os
 
+# ✅ Initialize Flask App
 app = Flask(__name__)
-api = Api(app)
+CORS(app)  # ✅ Enable CORS for frontend requests
 
-# Configure Logging
-logging.basicConfig(level=logging.INFO)
-
-# Connect to MongoDB
-MONGO_URI = os.getenv("MONGODB_ATLAS_URI")  # Store in environment variable
+# ✅ MongoDB Connection
+MONGO_URI = os.getenv("MONGODB_ATLAS_URI", "mongodb+srv://Femi:password_123@ecowheelsdublin.zpsyu.mongodb.net")
 client = pymongo.MongoClient(MONGO_URI)
-db = client.eco_wheels_db
-rentals_collection = db.rentals
-vehicles_collection = db.vehicles
-transactions_collection = db.transactions
+db = client["carrental"]
+transactions_collection = db["transactions"]
+vehicles_collection = db["vehicles"]
 
-# Rental Return Logic
-class ReturnCar(Resource):
-    def post(self):
-        """Handles returning a rental car."""
+# ✅ Define Route for Returning Cars
+@app.route("/api/return-car", methods=["POST"])
+def return_car():
+    try:
         data = request.get_json()
-        rental_id = data.get("rental_id")
+        transaction_id = data.get("transaction_id")
 
-        if not rental_id:
-            return jsonify({"status": "error", "message": "Missing rental_id"}), 400
+        if not transaction_id:
+            return jsonify({"error": "Missing transaction_id"}), 400
 
-        rental = rentals_collection.find_one({"_id": ObjectId(rental_id)})
+        # Find the transaction
+        transaction = transactions_collection.find_one({"transaction_id": transaction_id})
+        if not transaction:
+            return jsonify({"error": "Transaction not found"}), 404
 
-        if not rental:
-            return jsonify({"status": "error", "message": "Rental not found"}), 404
+        if transaction.get("status") == "returned":
+            return jsonify({"error": "Car already returned"}), 400
 
-        if rental.get("status") == "returned":
-            return jsonify({"status": "error", "message": "Car already returned"}), 400
-
-        # Calculate late fee if applicable
-        due_date = rental.get("due_date")  # Assume stored as datetime in DB
+        # Convert string date to datetime
+        due_date = datetime.strptime(transaction.get("end"), "%Y-%m-%d")
         return_time = datetime.utcnow()
         late_fee = 0
 
@@ -47,9 +42,9 @@ class ReturnCar(Resource):
             late_days = (return_time - due_date).days
             late_fee = late_days * 20  # Charge €20 per late day
 
-        # Update rental status in DB
-        rentals_collection.update_one(
-            {"_id": ObjectId(rental_id)},
+        # ✅ Update transaction status in DB
+        transactions_collection.update_one(
+            {"transaction_id": transaction_id},
             {
                 "$set": {
                     "status": "returned",
@@ -59,33 +54,22 @@ class ReturnCar(Resource):
             }
         )
 
-        # Process late fee transaction
-        if late_fee > 0:
-            transaction = {
-                "user_id": rental["user_id"],
-                "rental_id": rental_id,
-                "amount": late_fee,
-                "type": "late_fee",
-                "status": "pending",
-                "created_at": datetime.utcnow(),
-                "updated_at": datetime.utcnow()
-            }
-            transactions_collection.insert_one(transaction)
-
-        # Make vehicle available again
+        # ✅ Make vehicle available again
         vehicles_collection.update_one(
-            {"_id": ObjectId(rental["vehicle_id"])},
+            {"carId": int(transaction["vehicle_id"])},
             {"$set": {"available": True}}
         )
 
-        return {
+        return jsonify({
             "status": "success",
             "message": "Car returned successfully",
             "late_fee": late_fee
-        }
+        }), 200
 
-# Add to API Routes
-api.add_resource(ReturnCar, "/return-car")
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-if __name__ == '__main__':
-    app.run(debug=True)
+
+#  Run the Flask App
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)

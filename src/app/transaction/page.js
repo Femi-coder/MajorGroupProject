@@ -10,6 +10,8 @@ function TransactionContent() {
     const searchParams = useSearchParams();
     const [transaction, setTransaction] = useState(null);
     const [transactionStatus, setTransactionStatus] = useState("Loading...");
+    const [returnMessage, setReturnMessage] = useState("");
+    const [isReturning, setIsReturning] = useState(false);
 
     // ✅ Get data from URL parameters
     const transactionId = searchParams.get("transactionId");
@@ -40,6 +42,33 @@ function TransactionContent() {
                 setTransactionStatus(`Error fetching transaction: ${error.message}`);
             });
     }, [transactionId]);
+
+    const handleReturnCar = async () => {
+        setIsReturning(true);
+
+        try {
+            const response = await fetch("http://127.0.0.1:5000/api/return-car", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ transaction_id: transactionId }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setReturnMessage(` Success: ${data.message} ${data.late_fee ? `Late Fee: €${data.late_fee}` : ""}`);
+                setTransaction({ ...transaction, status: "returned" }); // Update UI
+            } else {
+                setReturnMessage(` Error: ${data.error}`);
+            }
+        } catch (error) {
+            setReturnMessage("⚠️ Server error. Please try again.");
+        }
+
+        setIsReturning(false);
+    };
 
     return (
         <Box sx={{ textAlign: "center", mt: 5 }}>
@@ -73,6 +102,18 @@ function TransactionContent() {
                     <Typography variant="h6">
                         <strong>Rental End:</strong> {end}
                     </Typography>
+                    {transaction.status === "active" && (
+                        <Button
+                            variant="contained"
+                            onClick={handleReturnCar}
+                            disabled={isReturning}
+                            sx={{ mt: 3, backgroundColor: "red", color: "white" }}
+                        >
+                            {isReturning ? "Processing..." : "Return Car"}
+                        </Button>
+                    )}
+
+                    {returnMessage && <Typography sx={{ mt: 2, color: "green" }}>{returnMessage}</Typography>}
 
                     <Button
                         variant="contained"

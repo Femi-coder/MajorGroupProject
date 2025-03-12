@@ -14,7 +14,7 @@ export async function GET() {
         const vehiclesCollection = db.collection("vehicles");
 
         // ✅ Fetch only available vehicles
-        const availableVehicles = await vehiclesCollection.find({ availability: true }).toArray();
+        const availableVehicles = await vehiclesCollection.find({ available: true }).toArray();
 
         await client.close();
 

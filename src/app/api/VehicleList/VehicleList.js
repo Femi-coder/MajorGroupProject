@@ -41,7 +41,7 @@ const VehicleList = ({ username, runShowRent }) => {
             alert(data.error);
         } else {
             setVehicles(prevVehicles => 
-                prevVehicles.map(v => v.carId === carId ? { ...v, availability: false } : v)
+                prevVehicles.map(v => v.carId === carId ? { ...v, available: false } : v)
             );
             alert("Vehicle has been rented!");
             setOpen(false);
@@ -75,8 +75,8 @@ const VehicleList = ({ username, runShowRent }) => {
               <Typography variant="h5" sx={{ fontWeight: "bold" }}>{vehicle.make} {vehicle.model}</Typography>
               <Typography variant="body1">Year: {vehicle.year}</Typography>
               <Typography variant="body1" color="primary">Price: ${vehicle.price}/day</Typography>
-              <Button variant="contained" sx={{ mt: 2, width: "100%" }} disabled={!vehicle.availability}>
-                {vehicle.availability ? "Rent Now" : "Unavailable"}
+              <Button variant="contained" sx={{ mt: 2, width: "100%" }} disabled={!vehicle.available}>
+                {vehicle.available ? "Rent Now" : "Unavailable"}
               </Button>
             </CardContent>
           </Card>
@@ -114,7 +114,7 @@ const VehicleList = ({ username, runShowRent }) => {
                 </Box>
 
                 <Box sx={{ textAlign: "center", mt: 3 }}>
-                  <Button variant="contained" color="primary" sx={{ width: "50%" }} disabled={!selectedVehicle.availability} onClick={() => handleRent(selectedVehicle.carId, selectedVehicle)}>
+                  <Button variant="contained" color="primary" sx={{ width: "50%" }} disabled={!selectedVehicle.available} onClick={() => handleRent(selectedVehicle.carId, selectedVehicle)}>
                     Rent This Vehicle
                   </Button>
                 </Box>

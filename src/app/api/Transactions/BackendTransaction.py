@@ -18,7 +18,7 @@ MONGO_URI = os.getenv("MONGODB_ATLAS_URI", "mongodb+srv://Femi:password_123@ecow
 client = pymongo.MongoClient(MONGO_URI)
 db = client["carrental"]
 transactions_collection = db["transactions"]
-vehicles_collection = db["vehicles"] 
+vehicles_collection = db["vehicles"]
 
 # ✅ Route to process a new transaction
 @app.route("/api/transactions", methods=["POST"])
@@ -51,13 +51,13 @@ def process_transaction():
             "transaction_id": transaction_id,
             "user_name": user_name,
             "vehicle_id": vehicle_id,
-            "vehicle_name": vehicle_name,  # ✅ Store full vehicle name
+            "vehicle_name": vehicle_name,
             "amount": amount,
             "pickup": pickup,
             "dropoff": dropoff,
             "start": start,
             "end": end,
-            "status": "completed",
+            "status": "active",
             "created_at": datetime.utcnow()
         }
 
