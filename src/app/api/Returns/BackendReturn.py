@@ -3,19 +3,21 @@ from flask_cors import CORS
 from datetime import datetime
 import pymongo
 import os
+from dotenv import load_dotenv
 
-#  Initialize Flask App
+load_dotenv()
+
+# Initialize Flask App
 app = Flask(__name__)
 CORS(app)
 
-#  MongoDB Connection
-MONGO_URI = os.getenv("MONGODB_ATLAS_URI", "mongodb+srv://Femi:password_123@ecowheelsdublin.zpsyu.mongodb.net")
+# MongoDB Connection
+MONGO_URI = os.getenv("MONGODB_ATLAS_URI")
 client = pymongo.MongoClient(MONGO_URI)
 db = client["carrental"]
 transactions_collection = db["transactions"]
 vehicles_collection = db["vehicles"]
 
-# Define Route for Returning Cars
 @app.route("/api/return-car", methods=["POST"])
 def return_car():
     try:
@@ -25,7 +27,6 @@ def return_car():
         if not transaction_id:
             return jsonify({"error": "Missing transaction_id"}), 400
 
-        # Find the transaction
         transaction = transactions_collection.find_one({"transaction_id": transaction_id})
         if not transaction:
             return jsonify({"error": "Transaction not found"}), 404
@@ -33,16 +34,10 @@ def return_car():
         if transaction.get("status") == "returned":
             return jsonify({"error": "Car already returned"}), 400
 
-        # Convert string date to datetime
         due_date = datetime.strptime(transaction.get("end"), "%Y-%m-%d")
         return_time = datetime.utcnow()
-        late_fee = 0
+        late_fee = max((return_time - due_date).days * 20, 0)
 
-        if return_time > due_date:
-            late_days = (return_time - due_date).days
-            late_fee = late_days * 20  # Charge €20 per late day
-
-        # Updates transaction status in DB
         transactions_collection.update_one(
             {"transaction_id": transaction_id},
             {
@@ -54,11 +49,9 @@ def return_car():
             }
         )
 
-        #Makes vehicle available again
-        vehicle_id = int(transaction["vehicle_id"]) 
         vehicles_collection.update_one(
-            {"carId": vehicle_id},
-            {"$set": {"available": True}}  # Sets vehicle as available
+            {"carId": int(transaction["vehicle_id"])},
+            {"$set": {"available": True}}
         )
 
         return jsonify({
@@ -70,10 +63,5 @@ def return_car():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-#  Run the Flask App
-if __name__ == "__main__":
-    app.run(debug=True, port=5000)
-    
 def handler(event, context):
     return app(event, context)
