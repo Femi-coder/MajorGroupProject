@@ -1,14 +1,14 @@
 {
     "version": 2,
     "builds": [
-      { "src": "api/reviews.py", "use": "@vercel/python" },
-      { "src": "api/transactions.py", "use": "@vercel/python" },
-      { "src": "api/Returns.py", "use": "@vercel/python" }
+      { "src": "src/app/api/reviews/BackendReviewsAPI.py", "use": "@vercel/python" },
+      { "src": "src/app/api/transactions/BackendTransaction.py", "use": "@vercel/python" },
+      { "src": "src/app/api/Returns/BackendReturn.py", "use": "@vercel/python" }
     ],
     "routes": [
-      { "src": "/api/reviews", "dest": "api/reviews.py" },
-      { "src": "/api/transactions", "dest": "api/transactions.py" },
-      { "src": "/api/Returns", "dest": "api/Returns.py" }
+      { "src": "/api/reviews", "dest": "src/app/api/reviews/BackendReviewsAPI.py" },
+      { "src": "/api/transactions", "dest": "src/app/api/transactions/BackendTransaction.py" },
+      { "src": "/api/return-car", "dest": "src/app/api/Returns/BackendReturn.py" }
     ]
   }
   
