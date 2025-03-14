@@ -20,7 +20,7 @@ db = client["carrental"]
 transactions_collection = db["transactions"]
 vehicles_collection = db["vehicles"]
 
-# ✅ Route to process a new transaction
+# Route to process a new transaction
 @app.route("/api/transactions", methods=["POST"])
 def process_transaction():
     try:
@@ -36,17 +36,17 @@ def process_transaction():
         if not user_name or not vehicle_id or not pickup or not dropoff or not start or not end:
             return jsonify({"error": "Missing required transaction details"}), 400
 
-        # ✅ Fetch the vehicle name from MongoDB
+        #  Fetch the vehicle name from MongoDB
         vehicle = vehicles_collection.find_one({"carId": int(vehicle_id)})
         if not vehicle:
             return jsonify({"error": "Vehicle not found"}), 404
 
         vehicle_name = f"{vehicle['make']} {vehicle['model']}"
 
-        # ✅ Generate a unique transaction_id
+        #  Generates a unique transaction_id
         transaction_id = str(uuid.uuid4())
 
-        # ✅ Create transaction record
+        # Create transaction record
         new_transaction = {
             "transaction_id": transaction_id,
             "user_name": user_name,
@@ -61,7 +61,7 @@ def process_transaction():
             "created_at": datetime.utcnow()
         }
 
-        # ✅ Insert transaction into database
+        # Insert transaction into database
         transactions_collection.insert_one(new_transaction)
 
         return jsonify({
@@ -73,7 +73,7 @@ def process_transaction():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ✅ Route to fetch a transaction by ID
+#  Route to fetch a transaction by ID
 @app.route("/api/transactions/<string:transaction_id>", methods=["GET"])
 def get_transaction(transaction_id):
     try:
@@ -84,6 +84,9 @@ def get_transaction(transaction_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ✅ Run the Flask server
+#  Run the Flask server
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
+    
+def handler(event, context):
+    return app(event, context)

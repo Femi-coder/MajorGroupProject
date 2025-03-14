@@ -13,7 +13,7 @@ function TransactionContent() {
     const [returnMessage, setReturnMessage] = useState("");
     const [isReturning, setIsReturning] = useState(false);
 
-    // ✅ Get data from URL parameters
+    // Get data from URL parameters
     const transactionId = searchParams.get("transactionId");
     const userName = searchParams.get("userName") || "Guest";  
     const vehicleName = searchParams.get("vehicleName") || "N/A";  
@@ -64,7 +64,7 @@ function TransactionContent() {
                 setReturnMessage(` Error: ${data.error}`);
             }
         } catch (error) {
-            setReturnMessage("⚠️ Server error. Please try again.");
+            setReturnMessage(" Server error. Please try again.");
         }
 
         setIsReturning(false);

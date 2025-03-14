@@ -4,18 +4,18 @@ from datetime import datetime
 import pymongo
 import os
 
-# ✅ Initialize Flask App
+#  Initialize Flask App
 app = Flask(__name__)
-CORS(app)  # ✅ Enable CORS for frontend requests
+CORS(app)
 
-# ✅ MongoDB Connection
+#  MongoDB Connection
 MONGO_URI = os.getenv("MONGODB_ATLAS_URI", "mongodb+srv://Femi:password_123@ecowheelsdublin.zpsyu.mongodb.net")
 client = pymongo.MongoClient(MONGO_URI)
 db = client["carrental"]
 transactions_collection = db["transactions"]
 vehicles_collection = db["vehicles"]
 
-# ✅ Define Route for Returning Cars
+# Define Route for Returning Cars
 @app.route("/api/return-car", methods=["POST"])
 def return_car():
     try:
@@ -42,7 +42,7 @@ def return_car():
             late_days = (return_time - due_date).days
             late_fee = late_days * 20  # Charge €20 per late day
 
-        # ✅ Update transaction status in DB
+        # Updates transaction status in DB
         transactions_collection.update_one(
             {"transaction_id": transaction_id},
             {
@@ -54,11 +54,11 @@ def return_car():
             }
         )
 
-        # ✅ Make vehicle available again
-        vehicle_id = int(transaction["vehicle_id"])  # Convert vehicle_id to int
+        #Makes vehicle available again
+        vehicle_id = int(transaction["vehicle_id"]) 
         vehicles_collection.update_one(
             {"carId": vehicle_id},
-            {"$set": {"available": True}}  # Set vehicle as available
+            {"$set": {"available": True}}  # Sets vehicle as available
         )
 
         return jsonify({
@@ -74,3 +74,6 @@ def return_car():
 #  Run the Flask App
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
+    
+def handler(event, context):
+    return app(event, context)
