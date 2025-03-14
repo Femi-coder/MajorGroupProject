@@ -52,5 +52,5 @@ def add_review():
         return jsonify({"error": str(e)}), 500
 
 # Required for Vercel
-def handler(event, context):
-    return app(event, context)
+from flask_lambda import FlaskLambda
+app = FlaskLambda(app)
