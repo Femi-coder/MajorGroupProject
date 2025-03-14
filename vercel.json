@@ -8,7 +8,7 @@
     "routes": [
       { "src": "/api/reviews", "dest": "src/app/api/reviews/BackendReviewsAPI.py" },
       { "src": "/api/transactions", "dest": "src/app/api/transactions/BackendTransaction.py" },
-      { "src": "/api/return-car", "dest": "src/app/api/Returns/BackendReturn.py" }
+      { "src": "/api/Returns", "dest": "src/app/api/Returns/BackendReturn.py" }
     ]
   }
   
