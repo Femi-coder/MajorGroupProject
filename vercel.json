@@ -1,0 +1,14 @@
+{
+    "version": 2,
+    "builds": [
+      { "src": "api/reviews.py", "use": "@vercel/python" },
+      { "src": "api/transactions.py", "use": "@vercel/python" },
+      { "src": "api/Returns.py", "use": "@vercel/python" }
+    ],
+    "routes": [
+      { "src": "/api/reviews", "dest": "api/reviews.py" },
+      { "src": "/api/transactions", "dest": "api/transactions.py" },
+      { "src": "/api/Returns", "dest": "api/Returns.py" }
+    ]
+  }
+  
