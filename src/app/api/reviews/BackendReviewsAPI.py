@@ -51,6 +51,6 @@ def add_review():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Required for Vercel
-from flask_lambda import FlaskLambda
-app = FlaskLambda(app)
+if __name__ != "__main__":
+    app = app
+
