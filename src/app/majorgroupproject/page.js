@@ -274,11 +274,13 @@ const handleConfirmBooking = async () => {
     
     
     const handleStudentShareRegister = () => {
-        const studentID = document.querySelector('input[name="studentID"]').value;
-        const drivingLicense = document.querySelector('input[name="drivingLicense"]').value;
+        const name = document.querySelector('input[name="name"]').value.trim();
+        const email = document.querySelector('input[name="email"]').value.trim();
+        const studentID = document.querySelector('input[name="studentID"]').value.trim();
+        const drivingLicense = document.querySelector('input[name="drivingLicense"]').value.trim();
     
-        if (!studentID || !drivingLicense) {
-            alert("Please enter both Student ID and Driving License Number.");
+        if (!name || !email || !studentID || !drivingLicense) {
+            alert("All fields are required.");
             return;
         }
     
@@ -288,8 +290,8 @@ const handleConfirmBooking = async () => {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                name: username,
-                email: userEmail,
+                name,
+                email,
                 studentID,
                 drivingLicense,
             }),
@@ -301,11 +303,22 @@ const handleConfirmBooking = async () => {
             } else {
                 alert('You have successfully registered for Student Share!');
                 setStudentShareRegistered(true);
-                setStudentShareDetails({ studentID, drivingLicense }); // ✅ Immediately update the state
-            }
-        })
-        .catch((err) => console.error('Error during Student Share registration:', err));
-    };
+                setStudentShareDetails({ name, email, studentID, drivingLicense });
+                setLoggedIn(true);
+            setUserEmail(email);
+            setUsername(name);
+
+            localStorage.setItem("user_email", email);
+            localStorage.setItem("username", name);
+
+            setTimeout(() => {
+                runShowVehicles();
+            }, 100);
+        }
+    })
+    .catch((err) => console.error('Error during Student Share registration:', err));
+};
+    
     
 
     const handleRegister = () => {
@@ -645,13 +658,24 @@ const handleConfirmBooking = async () => {
                 </Typography>
 
                 <FormControl sx={{ mt: 2, mb: 2 }}>
-                    <FormLabel>Student ID</FormLabel>
-                    <Input name="studentID" type="text" placeholder="Enter your Student ID" required />
-                </FormControl>
-                <FormControl sx={{ mt: 2, mb: 2 }}>
-                    <FormLabel>Driving License Number</FormLabel>
-                    <Input name="drivingLicense" type="text" placeholder="Enter your License Number" required />
-                </FormControl>
+        <FormLabel>Full Name</FormLabel>
+        <Input name="name" type="text" placeholder="Enter your full name" required />
+        </FormControl>
+
+        <FormControl sx={{ mt: 2, mb: 2 }}>
+        <FormLabel>Email Address</FormLabel>
+        <Input name="email" type="email" placeholder="Enter your email" required />
+        </FormControl>
+
+        <FormControl sx={{ mt: 2, mb: 2 }}>
+        <FormLabel>Student ID</FormLabel>
+        <Input name="studentID" type="text" placeholder="Enter your Student ID" required />
+        </FormControl>
+
+        <FormControl sx={{ mt: 2, mb: 2 }}>
+        <FormLabel>Driving License Number</FormLabel>
+        <Input name="drivingLicense" type="text" placeholder="Enter your License Number" required />
+        </FormControl>
                 <Button
                     variant="contained"
                     sx={{

@@ -7,13 +7,29 @@ const VehicleList = ({ username, runShowRent }) => {
   const [vehicles, setVehicles] = useState([]);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [open, setOpen] = useState(false);
+  const [isStudentShare, setIsStudentShare] = useState(false);
 
   useEffect(() => {
     fetch("/api/vehicles")
       .then(res => res.json())
       .then(data => setVehicles(data))
       .catch(error => console.error("Error fetching vehicles:", error));
-  }, []);
+      const email = localStorage.getItem("user_email");
+      if (email) {
+        fetch('/api/getStudentShareDetails', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        })
+        .then((res) => res.json())
+        .then((studentData) => {
+          if (studentData.studentID) {
+            setIsStudentShare(true);
+          }
+        })
+        .catch((err) => console.error('Error checking Student Share status:', err));
+      }
+    }, []);
 
   //  Open Modal
   const handleOpen = (event, vehicle) => {
@@ -22,6 +38,7 @@ const VehicleList = ({ username, runShowRent }) => {
     setSelectedVehicle(vehicle);
     setOpen(true);
   };
+  
 
   // Close Modal
   const handleClose = () => {
@@ -51,6 +68,7 @@ const VehicleList = ({ username, runShowRent }) => {
     .catch(error => console.error("Error renting vehicle:", error));
 };
 
+
   return (
     <Box sx={{ p: 4, textAlign: "center", backgroundColor: "#f5f5f5" }}>
       {username && (
@@ -58,6 +76,11 @@ const VehicleList = ({ username, runShowRent }) => {
           Hello, {username}!
         </Typography>
       )}
+        {isStudentShare && (
+        <Typography variant="h5" sx={{ color: "green", fontWeight: "bold", mb: 2 }}>
+          🎉 You are a Student Share member! Enjoy 15% off all rentals! 🚗💨
+        </Typography>
+        )}
       <Typography variant="h3" sx={{ fontWeight: "bold", mb: 4 }}>Choose Your Vehicle</Typography>
 
       {/* Vehicle List */}
@@ -74,7 +97,17 @@ const VehicleList = ({ username, runShowRent }) => {
             <CardContent>
               <Typography variant="h5" sx={{ fontWeight: "bold" }}>{vehicle.make} {vehicle.model}</Typography>
               <Typography variant="body1">Year: {vehicle.year}</Typography>
-              <Typography variant="body1" color="primary">Price: ${vehicle.price}/day</Typography>
+              <Typography variant="body1" color="primary">
+              Price: 
+                {isStudentShare ? (
+                  <>
+                    <s style={{ color: "red", marginRight: "5px" }}>${vehicle.price}</s> 
+                    <strong style={{ color: "green" }}>${(vehicle.price * 0.85).toFixed(2)}</strong>/day
+                  </>
+                ) : (
+                  `$${vehicle.price}/day`
+                )}
+                </Typography>
               <Button variant="contained" sx={{ mt: 2, width: "100%" }} disabled={!vehicle.available}>
                 {vehicle.available ? "Rent Now" : "Unavailable"}
               </Button>
