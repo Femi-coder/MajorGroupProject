@@ -12,6 +12,7 @@ function TransactionContent() {
     const [transactionStatus, setTransactionStatus] = useState("Loading...");
     const [returnMessage, setReturnMessage] = useState("");
     const [isReturning, setIsReturning] = useState(false);
+    const [finalPrice, setFinalPrice] = useState(null);
 
     // Get data from URL parameters
     const transactionId = searchParams.get("transactionId");
@@ -42,6 +43,20 @@ function TransactionContent() {
                 setTransactionStatus(`Error fetching transaction: ${error.message}`);
             });
     }, [transactionId]);
+
+    // Apply Student Share discount if applicable
+    useEffect(() => {
+        if (!price || price === "N/A") return; // Prevents running if price isn't set
+
+        const isStudentShare = localStorage.getItem("student_share_registered") === "true";
+
+        if (isStudentShare) {
+            const discountedPrice = (parseFloat(price) * 0.85).toFixed(2);
+            setFinalPrice(discountedPrice);
+        } else {
+            setFinalPrice(price);
+        }
+    }, [price]);
 
     const handleReturnCar = async () => {
         setIsReturning(true);
@@ -88,7 +103,17 @@ function TransactionContent() {
                         <strong>Vehicle:</strong> {vehicleName}
                     </Typography>
                     <Typography variant="h6">
-                        <strong>Price:</strong> ${price}
+                        <strong>Price:</strong> 
+                        {localStorage.getItem("student_share_registered") === "true" ? (
+                            <>
+                                <span style={{ textDecoration: "line-through", color: "red", marginRight: "8px" }}>
+                                    ${price}
+                                </span>
+                                <span> ${finalPrice || price}</span>
+                            </>
+                        ) : (
+                            `$${finalPrice || price}`
+                        )}
                     </Typography>
                     <Typography variant="h6">
                         <strong>Pickup:</strong> {pickup}

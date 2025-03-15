@@ -1,51 +1,37 @@
 import { MongoClient } from 'mongodb';
 
-const uri = 'mongodb+srv://Femi:password_123@ecowheelsdublin.zpsyu.mongodb.net';
-const dbName = 'carrental';
-
 export async function POST(req) {
-    let client;
     try {
-        const { name, email, studentID, drivingLicense } = await req.json();
+        const { email } = await req.json();
 
-        if (!name || !email || !studentID || !drivingLicense) {
-            return new Response(JSON.stringify({ error: "All fields are required" }), { status: 400 });
+        if (!email) {
+            return new Response(JSON.stringify({ error: "Email is required" }), { status: 400 });
         }
 
-        client = new MongoClient(uri);
+        const uri = 'mongodb+srv://Femi:password_123@ecowheelsdublin.zpsyu.mongodb.net';
+        const client = new MongoClient(uri);
+        const dbName = 'carrental';
+
         await client.connect();
         const db = client.db(dbName);
         const studentShareCollection = db.collection('studentShareUsers');
 
-        // Check if user is already registered
-        const existingStudent = await studentShareCollection.findOne({ email });
+        // Fetch Student Share details
+        const student = await studentShareCollection.findOne({ email });
 
-        if (existingStudent) {
-            return new Response(JSON.stringify({ error: "User is already registered for Student Share" }), { status: 400 });
+        if (!student) {
+            return new Response(JSON.stringify({ error: "Student Share registration not found" }), { status: 404 });
         }
 
-        // Register new Student Share user
-        const newStudent = {
-            name,
-            email,
-            studentID,
-            drivingLicense,
-            registeredAt: new Date(),
-        };
-
-        await studentShareCollection.insertOne(newStudent);
-
         return new Response(JSON.stringify({
-            message: "Student Share registration successful!",
-            studentID,
-            drivingLicense,
-            registeredAt: newStudent.registeredAt,
-        }), { status: 201 });
+            name: student.name,
+            studentID: student.studentID,
+            drivingLicense: student.drivingLicense,
+            registeredAt: student.registeredAt
+        }), { status: 200 });
 
     } catch (error) {
-        console.error("Error handling Student Share registration:", error);
+        console.error("Error fetching Student Share details:", error);
         return new Response(JSON.stringify({ error: "Internal server error" }), { status: 500 });
-    } finally {
-        if (client) await client.close();
     }
 }
