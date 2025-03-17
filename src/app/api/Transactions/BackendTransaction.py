@@ -41,7 +41,7 @@ def process_transaction():
         #  Check if user is a Student Share member
         student_share_user = studentshare_collection.find_one({"email": user_email})
         if student_share_user:
-            amount *= 0.85  #  Apply 15% discount for Student Share members
+            amount *= 0.85  # This Applies a 15% discount for Student Share members
             amount = round(amount, 2)  #  Round to 2 decimal places for consistency
 
         #  Fetch vehicle name from MongoDB

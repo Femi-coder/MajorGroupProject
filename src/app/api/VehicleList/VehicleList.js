@@ -17,10 +17,13 @@ const VehicleList = ({ username, runShowRent }) => {
             .then(res => res.json())
             .then(data => setVehicles(data))
             .catch(error => console.error("Error fetching vehicles:", error));
-
-        // Check if logged-in user is a Student Share member
+    
         const email = localStorage.getItem("user_email");
-        if (email) {
+        const studentShareStatus = localStorage.getItem("student_share_registered") === "true";
+    
+        if (studentShareStatus) {
+            setIsStudentShare(true);
+        } else if (email) {
             fetch('/api/getStudentShareDetails', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -28,6 +31,7 @@ const VehicleList = ({ username, runShowRent }) => {
             })
             .then((res) => res.json())
             .then((studentData) => {
+                console.log("Student Share API response:", studentData); // Debugging
                 if (studentData.studentID) {
                     setIsStudentShare(true);
                     localStorage.setItem("student_share_registered", "true");
@@ -39,26 +43,25 @@ const VehicleList = ({ username, runShowRent }) => {
             .catch((err) => console.error('Error checking Student Share status:', err));
         }
     }, []);
-
+    
     // Open Vehicle Details Modal
     const handleOpen = (event, vehicle) => {
-      event.preventDefault();
-      event.stopPropagation();
-  
-      // Retrieve Student Share status from localStorage
-      const isStudentShareMember = localStorage.getItem("student_share_registered") === "true";
-  
-      // Only apply discount if user is a Student Share member
-      const discountedPrice = isStudentShareMember ? (vehicle.price * 0.85).toFixed(2) : vehicle.price;
-  
-      setSelectedVehicle({
-          ...vehicle,
-          originalPrice: vehicle.price,  // Store original price for reference
-          discountedPrice: isStudentShareMember ? discountedPrice : null,  // Only apply discount if Student Share
-      });
-  
-      setOpen(true);
-  };
+        event.preventDefault();
+        event.stopPropagation();
+    
+        // Use the latest state value instead of localStorage
+        const discountedPrice = isStudentShare ? (vehicle.price * 0.85).toFixed(2) : vehicle.price;
+    
+        setSelectedVehicle({
+            ...vehicle,
+            originalPrice: vehicle.price,
+            discountedPrice: isStudentShare ? discountedPrice : null,
+        });
+    
+        setOpen(true);
+    };
+    
+    
   
     // Close Modal
     const handleClose = () => {
@@ -125,7 +128,7 @@ const VehicleList = ({ username, runShowRent }) => {
                             <Typography variant="body1">Year: {vehicle.year}</Typography>
                             <Typography variant="body1" color="primary">
                                 Price: 
-                                {isStudentShare ? (
+                                {isStudentShare && vehicle.price ? (
                                     <>
                                         <s style={{ color: "red", marginRight: "5px" }}>${vehicle.price}</s> 
                                         <strong style={{ color: "green" }}>${(vehicle.price * 0.85).toFixed(2)}</strong>/day
@@ -134,6 +137,7 @@ const VehicleList = ({ username, runShowRent }) => {
                                     `$${vehicle.price}/day`
                                 )}
                             </Typography>
+
                             <Button 
                                 variant="contained" 
                                 sx={{ mt: 2, width: "100%" }} 
@@ -177,18 +181,19 @@ const VehicleList = ({ username, runShowRent }) => {
                                         >
                                             {selectedVehicle.make} {selectedVehicle.model} ({selectedVehicle.year})
                                             <Typography variant="body1" color="primary" sx={{ fontSize: "18px", mb: 2 }}>
-                                        Price: 
-                                        {selectedVehicle.discountedPrice ? (
-                                            <>
-                                                <span style={{ textDecoration: "line-through", color: "red", marginRight: "8px" }}>
-                                                    ${selectedVehicle.originalPrice}
-                                                </span>
-                                                <span>${selectedVehicle.discountedPrice}/day</span>
-                                            </>
-                                        ) : (
-                                            `$${selectedVehicle.originalPrice}/day`
-                                        )}
-                                    </Typography>
+                                                Price: 
+                                                {isStudentShare && selectedVehicle.originalPrice ? (
+                                                    <>
+                                                        <span style={{ textDecoration: "line-through", color: "red", marginRight: "8px" }}>
+                                                            ${selectedVehicle.originalPrice}
+                                                        </span>
+                                                        <span>${(selectedVehicle.originalPrice * 0.85).toFixed(2)}/day</span>
+                                                    </>
+                                                ) : (
+                                                    `$${selectedVehicle.originalPrice}/day`
+                                                )}
+                                            </Typography>
+
 
                                         </Typography>
                                         <ul style={{ paddingLeft: "20px", color: "#444", fontSize: "16px" }}>

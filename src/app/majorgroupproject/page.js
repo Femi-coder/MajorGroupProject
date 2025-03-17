@@ -41,7 +41,29 @@ export default function MyApp() {
     const [dropoff, setDropoff] = useState('');
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
+    const [studentShareLoggedIn, setStudentShareLoggedIn] = useState(false);
 
+    useEffect(() => {
+        const storedEmail = localStorage.getItem("user_email");
+        const storedUsername = localStorage.getItem("username");
+        const isStudentShare = localStorage.getItem("student_share_registered") === "true";
+    
+        if (storedEmail && storedUsername) {
+            setUserEmail(storedEmail);
+            setUsername(storedUsername);
+    
+            if (isStudentShare) {
+                setStudentShareLoggedIn(true);
+                setStudentShareRegistered(true);
+                setLoggedIn(false); // Ensure normal login state is false for Student Share users
+            } else {
+                setLoggedIn(true);
+                setStudentShareLoggedIn(false);
+                setStudentShareRegistered(false); // Ensure Student Share state is false for normal users
+            }
+        }
+    }, []);
+    
 
     const resetPages = () => {
     const runShowVehicles = () => {
@@ -154,26 +176,31 @@ export default function MyApp() {
             }
     
             alert('Login successful!');
+    
+            // ✅ Reset all states
             setLoggedIn(true);
+            setStudentShareLoggedIn(false);  // Ensure Student Share login is off
+            setStudentShareRegistered(false);
+            setStudentShareDetails(null);
             setUserEmail(email);
             setUsername(data.username || 'User');
     
-            // ✅ Store user details
+            //  Clear any Student Share session data
+            localStorage.removeItem("student_share_registered");
+            localStorage.removeItem("student_share_details");
+    
+            //  Store normal user login details
             localStorage.setItem("user_email", email);
             localStorage.setItem("username", data.username || 'User');
     
-            // ✅ Remove Student Share registration status for normal users
-            localStorage.removeItem("student_share_registered");
-            setStudentShareRegistered(false);
-            setStudentShareDetails(null);
-    
-            // Redirect to home page
+            //  Redirect to the home page
             runShowFirst();
     
         } catch (error) {
             console.error('Error during login:', error);
         }
     };
+    
     
     useEffect(() => {
         axios.get("http://127.0.0.1:5000/api/reviews")
@@ -264,95 +291,185 @@ const handleConfirmBooking = async () => {
 };
 
 
-    const handleLogout = () => {
-        setLoggedIn(false);
-        setUsername('');
-        setUserEmail('');
-        setStudentShareRegistered(false);
-        setStudentShareDetails(null);
-        alert('You have been logged out.');
-        runShowFirst();
-    };
-    const handleShowStudentShare = () => {
-        resetPages(); // Reset other pages before displaying Student Share
-    
-        if (loggedIn) {
-            fetch('/api/getStudentShareDetails', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email: userEmail }),
-            })
-            .then((res) => res.json())
-            .then((data) => {
-                if (data.error) {
-                    setStudentShareRegistered(false);
-                    setStudentShareDetails(null);
-                } else {
-                    setStudentShareRegistered(true);
-                    setStudentShareDetails(data); // Store student details
-                }
-                setShowStudentShare(true);
-            })
-            .catch((err) => console.error('Error fetching Student Share details:', err));
-        } else {
-            setShowStudentShare(true); // If not logged in, still allow viewing the page
-        }
-    };
-    
-    
-    
-    const handleStudentShareRegister = () => {
-        const name = document.querySelector('input[name="name"]').value.trim();
-        const email = document.querySelector('input[name="email"]').value.trim();
-        const studentID = document.querySelector('input[name="studentID"]').value.trim();
-        const drivingLicense = document.querySelector('input[name="drivingLicense"]').value.trim();
-    
-        if (!name || !email || !studentID || !drivingLicense) {
-            alert("All fields are required.");
-            return;
-        }
-    
-        fetch('/api/studentshare', {
+const handleLogout = () => {
+    setLoggedIn(false);
+    setStudentShareLoggedIn(false);
+    setUsername('');
+    setUserEmail('');
+    setStudentShareRegistered(false);
+    setStudentShareDetails(null);
+
+    // ✅ Clear all stored session data
+    localStorage.clear();
+
+    alert('You have been logged out.');
+    runShowFirst(); // Redirect to Home after logout
+};
+
+
+const handleStudentShareLogout = () => {
+    setStudentShareLoggedIn(false);
+    setUsername('');
+    setUserEmail('');
+    setStudentShareRegistered(false);
+    setStudentShareDetails(null);
+
+    // ✅ Clear stored session data for Student Share
+    localStorage.removeItem("user_email");
+    localStorage.removeItem("username");
+    localStorage.removeItem("student_share_registered");
+
+    alert('You have been logged out from Student Share.');
+    runShowFirst(); // Redirect to Home after logout
+};
+
+
+const handleShowStudentShare = () => {
+    resetPages();
+
+    if (loggedIn || studentShareLoggedIn) {
+        fetch('/api/getStudentShareDetails', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                name,
-                email,
-                studentID,
-                drivingLicense,
-            }),
+            body: JSON.stringify({ email: userEmail }),
         })
         .then((res) => res.json())
         .then((data) => {
             if (data.error) {
-                alert(data.error);
+                setStudentShareRegistered(false);
+                setStudentShareDetails(null);
             } else {
-                alert('You have successfully registered for Student Share!');
-                
-                //  Update state to reflect logged-in user
-                setLoggedIn(true);
-                setUserEmail(email);
-                setUsername(name);
                 setStudentShareRegistered(true);
-                setStudentShareDetails({ name, email, studentID, drivingLicense });
-    
-                //  Store in localStorage for persistence
-                localStorage.setItem("user_email", email);
-                localStorage.setItem("username", name);
+                setStudentShareDetails(data);
+                setStudentShareLoggedIn(true);
+                setUserEmail(data.email);
+                setUsername(data.name);
+
+                // ✅ Store in localStorage
+                localStorage.setItem("user_email", data.email);
+                localStorage.setItem("username", data.name);
                 localStorage.setItem("student_share_registered", "true");
-    
-                //  Redirect to Vehicles page immediately
-                setTimeout(() => {
-                    runShowVehicles();
-                }, 300);
             }
+            setShowStudentShare(true);
         })
-        .catch((err) => console.error('Error during Student Share registration:', err));
-    };
+        .catch((err) => console.error('Error fetching Student Share details:', err));
+    } else {
+        setShowStudentShare(true);
+    }
+};
+    
+    
+    
+    
+const handleStudentShareRegister = () => {
+    const registerForm = document.querySelector('#studentShareRegisterForm');
+
+    if (!registerForm) {
+        alert("Form not found.");
+        return;
+    }
+
+    const name = registerForm.querySelector('input[name="registerName"]').value.trim();
+    const email = registerForm.querySelector('input[name="registerEmail"]').value.trim();
+    const studentID = registerForm.querySelector('input[name="registerStudentID"]').value.trim();
+    const drivingLicense = registerForm.querySelector('input[name="registerDrivingLicense"]').value.trim();
+    const password = registerForm.querySelector('input[name="registerPassword"]').value.trim();
+    const confirmPassword = registerForm.querySelector('input[name="registerConfirmPassword"]').value.trim();
+
+    if (!name || !email || !studentID || !drivingLicense || !password || !confirmPassword) {
+        alert("All fields in the registration form are required.");
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        alert("Passwords do not match.");
+        return;
+    }
+
+    fetch('/api/studentshare', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, studentID, drivingLicense, password }), // ✅ Include password
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error);
+        } else {
+            alert('You have successfully registered for Student Share!');
+
+            //  Store user data in localStorage
+            localStorage.setItem("user_email", email);
+            localStorage.setItem("username", name);
+            localStorage.setItem("student_share_registered", "true");
+
+            //  Set the correct states
+            setLoggedIn(false); // Logout normal user
+            setStudentShareLoggedIn(true); //  Mark Student Share as logged in
+            setUserEmail(email);
+            setUsername(name);
+            setStudentShareRegistered(true);
+            setStudentShareDetails({ name, email, studentID, drivingLicense });
+
+            setTimeout(() => {
+                runShowVehicles();
+            }, 300);
+        }
+    })
+    .catch(err => console.error('Error during Student Share registration:', err));
+};
+
+const handleStudentShareLogin = () => {
+    const email = document.querySelector('input[name="loginEmail"]').value.trim();
+    const password = document.querySelector('input[name="loginPassword"]').value.trim();
+
+
+    if (!email|| !password) {
+        alert("Please enter your email.");
+        return;
+    }
+
+    fetch('/api/getStudentShareDetails', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+    })
+    .then((res) => res.json())
+    .then((data) => {
+        if (data.error) {
+            alert("Invalid email or password.");
+        } else {
+            alert("Student Share Login successful!");
+
+            //  Reset normal user login states
+            setLoggedIn(false);
+            setStudentShareLoggedIn(true);
+            setStudentShareRegistered(true);
+            setStudentShareDetails(data);
+            setUserEmail(email);
+            setUsername(data.name);
+
+            //Remove normal user session data
+            localStorage.removeItem("user_email");
+            localStorage.removeItem("username");
+
+            // Store Student Share session details
+            localStorage.setItem("user_email", email);
+            localStorage.setItem("username", data.name);
+            localStorage.setItem("student_share_registered", "true");
+
+            // Redirect to vehicles page
+            runShowVehicles();
+        }
+    })
+    .catch((err) => console.error("Error during Student Share login:", err));
+};
+
+
+    
+    
     
     
     
@@ -397,36 +514,41 @@ const handleConfirmBooking = async () => {
     }}
 >
 
-            <AppBar
-                position="static"
-                sx={{
-                    backgroundColor: 'lightgreen',
-                    boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
-                }}
-            >
-                <Toolbar>
-                <Typography variant="h4" component="div" sx={{ flexGrow: 1, color: '#2E3B4E', fontWeight: 'bold' }}>
+<AppBar position="static" sx={{ backgroundColor: 'lightgreen' }}>
+    <Toolbar>
+        <Typography variant="h4" component="div" sx={{ flexGrow: 1, color: '#2E3B4E', fontWeight: 'bold' }}>
             Eco Wheels Dublin
         </Typography>
+
         <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowFirst}>
             Home
         </Button>
-        {!loggedIn && (
-            <>
-                <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowRegister}>
-                    Register
-                </Button>
-                <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowLogin}>
-                    Login
-                </Button>
-            </>
-        )}
-        {loggedIn && (
-            <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={handleLogout}>
-                Logout
-            </Button>
-        )}
-        <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={handleShowStudentShare}>
+
+       {/* Show Register & Login if NO user is logged in */}
+{!loggedIn && !studentShareLoggedIn ? (
+    <>
+        <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowRegister}>
+            Register
+        </Button>
+        <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowLogin}>
+            Login
+        </Button>
+    </>
+) : null}
+
+{loggedIn && (
+    <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={handleLogout}>
+        Logout (Normal User)
+    </Button>
+)}
+
+{studentShareLoggedIn && (
+    <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={handleStudentShareLogout}>
+        Logout (Student Share User)
+    </Button>
+)}
+
+<Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={handleShowStudentShare}>
     Student Share
 </Button>
 <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowMapApi}>
@@ -445,8 +567,10 @@ const handleConfirmBooking = async () => {
     Vehicles
 </Button>
 
-                </Toolbar>
-            </AppBar>
+    </Toolbar>
+</AppBar>
+
+
 
             {showFirstPage && (
     <Box
@@ -672,7 +796,6 @@ const handleConfirmBooking = async () => {
             Hello, {username || "Guest"}!
         </Typography>
 
-        {/* If user is already registered, show Student Share details */}
         {studentShareRegistered && studentShareDetails ? (
             <>
                 <Typography variant="h3" sx={{ color: "#2E3B4E", fontWeight: "bold", mb: 2 }}>
@@ -694,44 +817,22 @@ const handleConfirmBooking = async () => {
             </>
         ) : (
             <>
-                {/* Student Share Login Form */}
                 <Typography variant="h3" sx={{ color: "#2E3B4E", fontWeight: "bold", mb: 2 }}>
-                    Student Share Login
-                </Typography>
-                <FormControl sx={{ mt: 2, mb: 2 }}>
-                    <FormLabel>Email Address</FormLabel>
-                    <Input name="email" type="email" placeholder="Enter your email" required />
-                </FormControl>
+                Student Share Login
+            </Typography>
+            <FormControl sx={{ mt: 2, mb: 2 }}>
+                <FormLabel>Email Address</FormLabel>
+                <Input name="loginEmail" type="email" placeholder="Enter your email" required />
+            </FormControl>
+            <FormControl sx={{ mt: 2, mb: 2 }}>
+                <FormLabel>Password</FormLabel>
+                <Input name="loginPassword" type="password" placeholder="Enter your password" required />
+            </FormControl>
+
                 <Button
                     variant="contained"
                     sx={{ mt: 2, backgroundColor: "#2E3B4E", color: "white", ":hover": { backgroundColor: "#4C5E72" } }}
-                    onClick={() => {
-                        const email = document.querySelector('input[name="email"]').value.trim();
-                        if (!email) {
-                            alert("Please enter your email.");
-                            return;
-                        }
-
-                        fetch('/api/getStudentShareDetails', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ email }),
-                        })
-                        .then((res) => res.json())
-                        .then((data) => {
-                            if (data.error) {
-                                alert("Invalid Student Share email.");
-                            } else {
-                                localStorage.setItem("user_email", email);
-                                localStorage.setItem("username", data.name);
-                                localStorage.setItem("student_share_registered", "true");
-
-                                alert("Login successful!");
-                                runShowVehicles(); // Redirect to Vehicles
-                            }
-                        })
-                        .catch((err) => console.error("Error during Student Share login:", err));
-                    }}
+                    onClick={handleStudentShareLogin}
                 >
                     Login
                 </Button>
@@ -740,44 +841,55 @@ const handleConfirmBooking = async () => {
                 <Typography variant="h3" sx={{ color: "#2E3B4E", fontWeight: "bold", mt: 4 }}>
                     Or Register for Student Share
                 </Typography>
-                <FormControl sx={{ mt: 2, mb: 2 }}>
-                    <FormLabel>Full Name</FormLabel>
-                    <Input name="name" type="text" placeholder="Enter your full name" required />
+                <Box component="form" id="studentShareRegisterForm" sx={{ mt: 4 }}>
+                    <FormControl sx={{ mt: 2, mb: 2 }}>
+                        <FormLabel>Full Name</FormLabel>
+                        <Input name="registerName" type="text" placeholder="Enter your full name" required />
+                    </FormControl>
+                    <FormControl sx={{ mt: 2, mb: 2 }}>
+                        <FormLabel>Email Address</FormLabel>
+                        <Input name="registerEmail" type="email" placeholder="Enter your email" required />
+                    </FormControl>
+                    <FormControl sx={{ mt: 2, mb: 2 }}>
+                        <FormLabel>Student ID</FormLabel>
+                        <Input name="registerStudentID" type="text" placeholder="Enter your Student ID" required />
+                    </FormControl>
+                    <FormControl sx={{ mt: 2, mb: 2 }}>
+                        <FormLabel>Driving License Number</FormLabel>
+                        <Input name="registerDrivingLicense" type="text" placeholder="Enter your License Number" required />
+                    </FormControl>
+                    <FormControl sx={{ mt: 2, mb: 2 }}>
+                    <FormLabel>Password</FormLabel>
+                    <Input name="registerPassword" type="password" placeholder="Enter a password" required />
                 </FormControl>
                 <FormControl sx={{ mt: 2, mb: 2 }}>
-                    <FormLabel>Email Address</FormLabel>
-                    <Input name="email" type="email" placeholder="Enter your email" required />
+                    <FormLabel>Confirm Password</FormLabel>
+                    <Input name="registerConfirmPassword" type="password" placeholder="Confirm your password" required />
                 </FormControl>
-                <FormControl sx={{ mt: 2, mb: 2 }}>
-                    <FormLabel>Student ID</FormLabel>
-                    <Input name="studentID" type="text" placeholder="Enter your Student ID" required />
-                </FormControl>
-                <FormControl sx={{ mt: 2, mb: 2 }}>
-                    <FormLabel>Driving License Number</FormLabel>
-                    <Input name="drivingLicense" type="text" placeholder="Enter your License Number" required />
-                </FormControl>
-                <Button
-                    variant="contained"
-                    sx={{ mt: 3, backgroundColor: "#2E3B4E", color: "white", ":hover": { backgroundColor: "#4C5E72" } }}
-                    onClick={handleStudentShareRegister}
-                >
-                    Register for Student Share
-                </Button>
+                    <Button
+                        variant="contained"
+                        sx={{ mt: 3, backgroundColor: "#2E3B4E", color: "white", ":hover": { backgroundColor: "#4C5E72" } }}
+                        onClick={handleStudentShareRegister}
+                    >
+                        Register for Student Share
+                    </Button>
+                </Box>
+
+                {/* Back to Home Button */}
+                <Box sx={{ mt: 4 }}>
+                    <Button
+                        variant="contained"
+                        sx={{ backgroundColor: "#2E3B4E", color: "white", ":hover": { backgroundColor: "#4C5E72" } }}
+                        onClick={runShowFirst}
+                    >
+                        Back to Home
+                    </Button>
+                </Box>
             </>
         )}
-
-        {/* Back to Home Button */}
-        <Box sx={{ mt: 4 }}>
-            <Button
-                variant="contained"
-                sx={{ backgroundColor: "#2E3B4E", color: "white", ":hover": { backgroundColor: "#4C5E72" } }}
-                onClick={runShowFirst}
-            >
-                Back to Home
-            </Button>
-        </Box>
     </Box>
 )}
+
 
 
 
