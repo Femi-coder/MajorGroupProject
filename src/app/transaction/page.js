@@ -94,9 +94,6 @@ function TransactionContent() {
             {transaction ? (
                 <>
                     <Typography variant="h6">
-                        <strong>Transaction ID:</strong> {transaction.transaction_id}
-                    </Typography>
-                    <Typography variant="h6">
                         <strong>Hello, {userName}!</strong>
                     </Typography>
                     <Typography variant="h6">

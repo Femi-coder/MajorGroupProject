@@ -13,6 +13,8 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import axios from "axios";
 import { useRouter } from 'next/navigation';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+
 
 import { useState, useEffect } from 'react';
 import VehicleList from '../api/VehicleList/VehicleList.js';
@@ -42,6 +44,9 @@ export default function MyApp() {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [studentShareLoggedIn, setStudentShareLoggedIn] = useState(false);
+    const [vehicles, setVehicles] = useState([]);
+    const [showAdminPage, setShowAdminPage] = useState(false);
+    const [adminLoggedIn, setAdminLoggedIn] = useState(false);
 
     useEffect(() => {
         const storedEmail = localStorage.getItem("user_email");
@@ -61,6 +66,19 @@ export default function MyApp() {
                 setStudentShareLoggedIn(false);
                 setStudentShareRegistered(false); // Ensure Student Share state is false for normal users
             }
+        }
+    }, []);
+    useEffect(() => {
+        if (showAdminPage) {
+            fetchAdminVehicles();
+        }
+    }, [showAdminPage]);
+
+    useEffect(() => {
+        // ✅ Check if admin is already logged in
+        const storedAdmin = localStorage.getItem("admin_logged_in");
+        if (storedAdmin === "true") {
+            setAdminLoggedIn(true);
         }
     }, []);
     
@@ -117,6 +135,34 @@ export default function MyApp() {
         setShowReviews(true);
     };
 
+    const fetchAdminVehicles = async () => {
+        try {
+            const response = await fetch("/api/admin");
+            const text = await response.text(); // Get raw response before parsing
+            console.log("Raw response from server:", text);
+    
+            if (!response.ok) {
+                console.error(`Server Error: ${response.status} - ${response.statusText}`);
+                throw new Error(`Failed to fetch vehicles: ${response.statusText}`);
+            }
+    
+            const data = text ? JSON.parse(text) : []; // Ensure parsing only if content exists
+    
+            if (!Array.isArray(data)) {
+                console.error("Unexpected response format:", data);
+                setVehicles([]); // Reset vehicles to prevent crashing
+            } else {
+                setVehicles(data);
+            }
+        } catch (error) {
+            console.error("Error fetching vehicles:", error);
+            setVehicles([]); // Ensure it remains an array
+        }
+    };
+    
+    
+    
+
     const runShowRent = (vehicle = null) => {
         const storedEmail = localStorage.getItem("user_email"); // Fetch stored email
         const isStudentShare = localStorage.getItem("student_share_registered") === "true"; // Check if Student Share user
@@ -131,7 +177,39 @@ export default function MyApp() {
         resetPages();
         setShowRent(true);
     };
+    const toggleVehicleAvailability = async (carId, currentStatus) => {
+        try {
+            console.log(`Updating vehicle ${carId} availability to ${!currentStatus}`);
     
+            const response = await fetch('/api/admin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ carId, available: !currentStatus }),
+            });
+    
+            // ✅ Check response status
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error(`Error: ${response.status} - ${response.statusText}`, errorText);
+                alert("Failed to update vehicle availability.");
+                return;
+            }
+    
+            // ✅ Parse JSON response safely
+            const data = await response.json();
+            console.log(" Success:", data);
+    
+            alert("Vehicle availability updated successfully!");
+            fetchAdminVehicles();
+        } catch (error) {
+            console.error(' Error updating vehicle availability:', error);
+            alert("Something went wrong. Please try again.");
+        }
+    };
+    
+    
+    
+        
 
     const runShowContact = () => {
         if (!loggedIn) {
@@ -499,6 +577,43 @@ const handleStudentShareLogin = () => {
             })
             .catch((err) => console.error('Error during registration:', err));
     };
+    const handleAdminLogin = async () => {
+        const email = prompt("Enter admin email:");
+        const password = prompt("Enter admin password:");
+    
+        if (!email || !password) {
+            alert("Please enter both email and password.");
+            return;
+        }
+    
+        try {
+            const response = await fetch("/api/adminLogin", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password }),
+            });
+    
+            const data = await response.json();
+    
+            if (response.ok) {
+                alert("Admin login successful!");
+                localStorage.setItem("admin_logged_in", "true"); // ✅ Store session
+                setAdminLoggedIn(true);
+            } else {
+                alert("Login failed: " + data.error);
+            }
+        } catch (error) {
+            console.error(" Error during login:", error);
+            alert("Something went wrong. Please try again.");
+        }
+    };
+    
+    const handleAdminLogout = () => {
+        localStorage.removeItem("admin_logged_in");
+        setAdminLoggedIn(false);
+        setShowAdminPage(false);
+        alert("Logged out successfully.");
+    };
 
     return (
         <Box
@@ -566,6 +681,39 @@ const handleStudentShareLogin = () => {
 <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowVehicles}>
     Vehicles
 </Button>
+{/*  Shows Admin Login button when NOT logged in */}
+{!adminLoggedIn && (
+    <Button color="inherit" sx={{ fontWeight: 'bold' }}
+        onClick={handleAdminLogin}
+    >
+        Admin Login
+    </Button>
+)}
+
+{/*Show "Go to Admin Panel" button when logged in */}
+{adminLoggedIn && (
+    <>
+        <Button
+            variant="contained"
+            sx={{ mt: 2, backgroundColor: "#2E3B4E", color: "white", ml: 2 }}
+            onClick={() => setShowAdminPage(true)}
+        >
+            Go to Admin Panel
+        </Button>
+
+        {/* Shows Logout button for Admin */}
+        <Button
+            variant="contained"
+            sx={{ mt: 2, backgroundColor: "red", color: "white", ml: 2 }}
+            onClick={handleAdminLogout}
+        >
+            Logout Admin
+        </Button>
+    </>
+)}
+
+
+
 
     </Toolbar>
 </AppBar>
@@ -1149,6 +1297,47 @@ const handleStudentShareLogin = () => {
         </Box>
     </Box>
 )}
+{adminLoggedIn && showAdminPage && (
+    <Box sx={{ p: 4, textAlign: "center", backgroundColor: "#f5f5f5" }}>
+        <Typography variant="h3" sx={{ fontWeight: "bold", mb: 4 }}>
+            Admin Dashboard - Manage Vehicles
+        </Typography>
+
+        <TableContainer component={Paper} sx={{ maxWidth: "900px", margin: "auto" }}>
+            <Table>
+                <TableHead>
+                    <TableRow>
+                        <TableCell><strong>Vehicle</strong></TableCell>
+                        <TableCell><strong>Year</strong></TableCell>
+                        <TableCell><strong>Price ($/day)</strong></TableCell>
+                        <TableCell><strong>Availability</strong></TableCell>
+                        <TableCell><strong>Action</strong></TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {vehicles.map((vehicle) => (
+                        <TableRow key={vehicle.carId}>
+                            <TableCell>{vehicle.make} {vehicle.model}</TableCell>
+                            <TableCell>{vehicle.year}</TableCell>
+                            <TableCell>${vehicle.price}</TableCell>
+                            <TableCell>{vehicle.available ? "Available" : "Unavailable"}</TableCell>
+                            <TableCell>
+                                <Button 
+                                    variant="contained"
+                                    sx={{ backgroundColor: vehicle.available ? "red" : "green", color: "white" }}
+                                    onClick={() => toggleVehicleAvailability(vehicle.carId, vehicle.available)}
+                                >
+                                    {vehicle.available ? "Set Unavailable" : "Set Available"}
+                                </Button>
+                            </TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </TableContainer>
+    </Box>
+)}
+
 
 
 
