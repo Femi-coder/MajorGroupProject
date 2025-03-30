@@ -187,7 +187,7 @@ export default function MyApp() {
                 body: JSON.stringify({ carId, available: !currentStatus }),
             });
     
-            // ✅ Check response status
+            // Check response status
             if (!response.ok) {
                 const errorText = await response.text();
                 console.error(`Error: ${response.status} - ${response.statusText}`, errorText);
@@ -195,7 +195,7 @@ export default function MyApp() {
                 return;
             }
     
-            // ✅ Parse JSON response safely
+            //  Parse JSON response safely
             const data = await response.json();
             console.log(" Success:", data);
     
@@ -255,7 +255,7 @@ export default function MyApp() {
     
             alert('Login successful!');
     
-            // ✅ Reset all states
+            //  Reset all states
             setLoggedIn(true);
             setStudentShareLoggedIn(false);  // Ensure Student Share login is off
             setStudentShareRegistered(false);
@@ -328,7 +328,7 @@ const handleConfirmBooking = async () => {
     try {
         const storedUsername = localStorage.getItem("username"); // Fetch stored username
         const storedEmail = localStorage.getItem("user_email"); //  Fetch stored email
-        const isStudentShare = localStorage.getItem("student_share_registered") === "true"; // ✅ Check if Student Share user
+        const isStudentShare = localStorage.getItem("student_share_registered") === "true"; //  Check if Student Share user
 
         let finalPrice = selectedRentVehicle.price;
         if (isStudentShare) {
@@ -377,7 +377,7 @@ const handleLogout = () => {
     setStudentShareRegistered(false);
     setStudentShareDetails(null);
 
-    // ✅ Clear all stored session data
+    //  Clear all stored session data
     localStorage.clear();
 
     alert('You have been logged out.');
@@ -392,7 +392,7 @@ const handleStudentShareLogout = () => {
     setStudentShareRegistered(false);
     setStudentShareDetails(null);
 
-    // ✅ Clear stored session data for Student Share
+    //  Clear stored session data for Student Share
     localStorage.removeItem("user_email");
     localStorage.removeItem("username");
     localStorage.removeItem("student_share_registered");
@@ -578,8 +578,8 @@ const handleStudentShareLogin = () => {
             .catch((err) => console.error('Error during registration:', err));
     };
     const handleAdminLogin = async () => {
-        const email = prompt("Enter admin email:");
-        const password = prompt("Enter admin password:");
+        const email = prompt("Enter admin email:")?.trim().toLowerCase();
+        const password = prompt("Enter admin password:")?.trim();
     
         if (!email || !password) {
             alert("Please enter both email and password.");
@@ -597,16 +597,18 @@ const handleStudentShareLogin = () => {
     
             if (response.ok) {
                 alert("Admin login successful!");
-                localStorage.setItem("admin_logged_in", "true"); // ✅ Store session
+                localStorage.setItem("admin_logged_in", "true");
+                localStorage.setItem("admin_name", data.name || "Admin");
                 setAdminLoggedIn(true);
             } else {
                 alert("Login failed: " + data.error);
             }
         } catch (error) {
-            console.error(" Error during login:", error);
+            console.error("Error during login:", error);
             alert("Something went wrong. Please try again.");
         }
     };
+    
     
     const handleAdminLogout = () => {
         localStorage.removeItem("admin_logged_in");
