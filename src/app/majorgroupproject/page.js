@@ -335,7 +335,7 @@ const handleConfirmBooking = async () => {
             finalPrice = (finalPrice * 0.85).toFixed(2); //  Apply 15% discount for Student Share members
         }
 
-        const response = await fetch("http://127.0.0.1:5000/api/transactions", {
+        const response = await fetch("https://flask-api1-8su9.onrender.com/api/transactions", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
