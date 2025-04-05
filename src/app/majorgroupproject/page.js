@@ -75,7 +75,7 @@ export default function MyApp() {
     }, [showAdminPage]);
 
     useEffect(() => {
-        // ✅ Check if admin is already logged in
+        // Check if admin is already logged in
         const storedAdmin = localStorage.getItem("admin_logged_in");
         if (storedAdmin === "true") {
             setAdminLoggedIn(true);
@@ -425,7 +425,7 @@ const handleShowStudentShare = () => {
                 setUserEmail(data.email);
                 setUsername(data.name);
 
-                // ✅ Store in localStorage
+                //  Store in localStorage
                 localStorage.setItem("user_email", data.email);
                 localStorage.setItem("username", data.name);
                 localStorage.setItem("student_share_registered", "true");
@@ -469,7 +469,7 @@ const handleStudentShareRegister = () => {
     fetch('/api/studentshare', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, studentID, drivingLicense, password }), // ✅ Include password
+        body: JSON.stringify({ name, email, studentID, drivingLicense, password }),
     })
     .then(res => res.json())
     .then(data => {
@@ -722,131 +722,170 @@ const handleStudentShareLogin = () => {
 
 
 
-            {showFirstPage && (
+{showFirstPage && (
+  <Box sx={{ p: 0, backgroundColor: '#F4F6F8', minHeight: '100vh' }}>
+    {/* HERO SECTION */}
     <Box
-        sx={{
-            p: 4,
-            textAlign: 'center',
-            border: '1px dashed grey',
-            margin: '20px',
-            backgroundColor: 'white',
-            borderRadius: '10px',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-        }}
+      sx={{
+        width: '100%',
+        py: 10,
+        px: 2,
+        textAlign: 'center',
+        background: 'linear-gradient(to right, #1C1F26, #2E3B4E)',
+        color: 'white',
+      }}
     >
-        <Typography variant="h3" sx={{ color: '#2E3B4E', fontWeight: 'bold', mb: 2 }}>
-            Welcome to Eco Wheels Dublin 
-        </Typography>
-        {loggedIn && (
-            <Typography variant="h5" sx={{ mt: 1, color: '#2E3B4E' }}>
-                Hello, {username}!
-            </Typography>
-        )}
-        <Typography variant="h5" sx={{ mt: 2, color: '#2E3B4E', mb: 4 }}>
-            Rent your eco-friendly car today!
-        </Typography>
+      <Typography variant="h2" sx={{ fontWeight: 'bold', mb: 2 }}>
+        ⚡ Eco Wheels Dublin
+      </Typography>
+      <Typography variant="h6" sx={{ maxWidth: '720px', mx: 'auto', lineHeight: 1.6 }}>
+        Green, clean & affordable electric car rentals tailored for students and eco-conscious drivers in Dublin.
+      </Typography>
 
-        {/* Car Listings */}
-        <Box
+      {loggedIn && (
+        <Box sx={{ mt: 5, display: 'flex', justifyContent: 'center', gap: 3, flexWrap: 'wrap' }}>
+          <Button
+            variant="contained"
+            sx={{ backgroundColor: '#4CAF50', color: 'white', fontWeight: 'bold', px: 3 }}
+            onClick={runShowVehicles}
+          >
+            🚗 Explore Rentals
+          </Button>
+          <Button
+            variant="outlined"
+            sx={{ borderColor: '#fff', color: '#fff', fontWeight: 'bold', px: 3 }}
+            onClick={handleShowStudentShare}
+          >
+            🎓 Student Share
+          </Button>
+          <Typography
+            variant="h6"
             sx={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                justifyContent: 'center',
-                gap: 2,
+              mt: 1,
+              px: 3,
+              py: 1,
+              backgroundColor: 'rgba(255,255,255,0.1)',
+              borderRadius: '10px',
+              fontWeight: 'bold',
             }}
-        >
-            <Box
-                sx={{
-                    width: '300px',
-                    backgroundColor: '#f5f5f5',
-                    borderRadius: '10px',
-                    overflow: 'hidden',
-                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                }}
-            >
-                <img
-                    src="https://changinglanes.ie/wp-content/uploads/2024/01/BYD-SEAL-1-scaled.jpg"
-                    alt="Electric Car 1"
-                    style={{ width: '100%', height: 'auto' }}
-                />
-                <Typography sx={{ p: 2, fontWeight: 'bold', color: '#2E3B4E' }}>
-                    Affordable Rentals
-                </Typography>
-            </Box>
-
-            <Box
-                sx={{
-                    width: '300px',
-                    backgroundColor: '#f5f5f5',
-                    borderRadius: '10px',
-                    overflow: 'hidden',
-                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                }}
-            >
-                <img
-                    src="https://c.ndtvimg.com/2021-11/1316no38_mg-zs-ev_625x300_26_November_21.jpg"
-                    alt="Electric Car 2"
-                    style={{ width: '100%', height: 'auto' }}
-                />
-                <Typography sx={{ p: 2, fontWeight: 'bold', color: '#2E3B4E' }}>
-                    Eco-Friendly Fleet
-                </Typography>
-            </Box>
-
-            <Box
-                sx={{
-                    width: '300px',
-                    backgroundColor: '#f5f5f5',
-                    borderRadius: '10px',
-                    overflow: 'hidden',
-                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                }}
-            >
-                <img
-                    src="https://car-images.bauersecure.com/wp-images/2697/kia_ev6_best_electric_cars_2024.jpg"
-                    alt="Electric Car 3"
-                    style={{ width: '100%', height: 'auto' }}
-                />
-                <Typography sx={{ p: 2, fontWeight: 'bold', color: '#2E3B4E' }}>
-                    Convenient Locations
-                </Typography>
-            </Box>
+          >
+            👋 Welcome, {username}
+          </Typography>
         </Box>
-
-        {/* Buttons for Explore Rent Options & Student Share (Side by Side) */}
-        {loggedIn && (
-            <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center', gap: 2 }}>
-                <Button
-                    variant="contained"
-                    sx={{
-                        backgroundColor: '#2E3B4E',
-                        color: 'white',
-                        ':hover': {
-                            backgroundColor: '#4C5E72',
-                        },
-                    }}
-                    onClick={runShowVehicles} // Navigate to Vehicles Page
-                >
-                    Explore Rental Options
-                </Button>
-
-                <Button
-                    variant="contained"
-                    sx={{
-                        backgroundColor: '#2E3B4E',
-                        color: 'white',
-                        ':hover': {
-                            backgroundColor: '#4C5E72',
-                        },
-                    }}
-                    onClick={handleShowStudentShare} // Navigate to Student Share section
-                >
-                    Join Student Share
-                </Button>
-            </Box>
-        )}
+      )}
     </Box>
+
+    {/* FEATURES / CAR SECTION */}
+    <Box
+      sx={{
+        py: 8,
+        px: 3,
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        gap: 4,
+        backgroundColor: '#fff',
+      }}
+    >
+      {[
+        {
+          title: 'Affordable Rentals',
+          img: 'https://changinglanes.ie/wp-content/uploads/2024/01/BYD-SEAL-1-scaled.jpg',
+        },
+        {
+          title: 'Eco-Friendly Fleet',
+          img: 'https://c.ndtvimg.com/2021-11/1316no38_mg-zs-ev_625x300_26_November_21.jpg',
+        },
+        {
+          title: 'Convenient Locations',
+          img: 'https://car-images.bauersecure.com/wp-images/2697/kia_ev6_best_electric_cars_2024.jpg',
+        },
+        {
+          title: 'Charging Included',
+          img: 'https://timestech.in/wp-content/uploads/2019/09/Electric-Vehicle.jpg',
+        },
+      ].map((car, index) => (
+        <Box
+          key={index}
+          sx={{
+            width: { xs: '90%', sm: '45%', md: '300px' },
+            borderRadius: '12px',
+            overflow: 'hidden',
+            backgroundColor: '#F9F9F9',
+            boxShadow: '0 6px 15px rgba(0,0,0,0.1)',
+            transition: 'transform 0.3s ease',
+            ':hover': {
+              transform: 'scale(1.03)',
+            },
+          }}
+        >
+          <img src={car.img} alt={car.title} style={{ width: '100%', height: '200px', objectFit: 'cover' }} />
+          <Typography sx={{ p: 2, fontWeight: 'bold', textAlign: 'center', color: '#2E3B4E' }}>
+            {car.title}
+          </Typography>
+        </Box>
+      ))}
+    </Box>
+
+    {/* CTA SECTION */}
+    <Box
+      sx={{
+        py: 8,
+        px: 3,
+        textAlign: 'center',
+        backgroundColor: '#F4F6F8',
+        borderTop: '1px solid #ddd',
+      }}
+    >
+      <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#2E3B4E', mb: 2 }}>
+        🚀 Ready to Drive Green?
+      </Typography>
+      <Typography variant="body1" sx={{ maxWidth: '640px', mx: 'auto', mb: 4 }}>
+        Join our movement toward sustainability. Register now and get behind the wheel of your future.
+      </Typography>
+
+      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 3, flexWrap: 'wrap' }}>
+        <Button
+          variant="contained"
+          sx={{
+            backgroundColor: '#2E3B4E',
+            color: 'white',
+            px: 4,
+            py: 1.5,
+            fontWeight: 'bold',
+            borderRadius: '8px',
+            ':hover': { backgroundColor: '#1A232F' },
+          }}
+          onClick={runShowRegister}
+        >
+          🔥 Register as a User
+        </Button>
+
+        <Button
+          variant="outlined"
+          sx={{
+            borderColor: '#2E3B4E',
+            color: '#2E3B4E',
+            px: 4,
+            py: 1.5,
+            fontWeight: 'bold',
+            borderRadius: '8px',
+            ':hover': {
+              backgroundColor: '#eeeeee',
+            },
+          }}
+          onClick={handleShowStudentShare}
+        >
+          💼 Student Share Sign Up
+        </Button>
+      </Box>
+    </Box>
+  </Box>
 )}
+
+
+
+
 
 
 

@@ -5,6 +5,10 @@ import { useState, useEffect, Suspense } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+
+
 
 function TransactionContent() {
     const searchParams = useSearchParams();
@@ -23,6 +27,33 @@ function TransactionContent() {
     const dropoff = searchParams.get("dropoff") || "N/A";
     const start = searchParams.get("start") || "N/A";
     const end = searchParams.get("end") || "N/A";
+
+    const handleDownloadPDF = () => {
+        const doc = new jsPDF();
+    
+        doc.setFontSize(18);
+        doc.text("Eco Wheels Dublin - Transaction Summary", 14, 22);
+    
+        const tableData = [
+            ["Name", userName],
+            ["Vehicle", vehicleName],
+            ["Price", `$${finalPrice || price}`],
+            ["Pickup", pickup],
+            ["Dropoff", dropoff],
+            ["Start Date", start],
+            ["End Date", end],
+            ["Transaction ID", transactionId],
+        ];
+    
+        autoTable(doc,{
+            startY: 30,
+            head: [["Field", "Value"]],
+            body: tableData
+        });
+    
+        doc.save(`EcoWheels_Transaction_${transactionId}.pdf`);
+    };
+    
 
     useEffect(() => {
         if (!transactionId) {
@@ -134,6 +165,12 @@ function TransactionContent() {
                             {isReturning ? "Processing..." : "Return Car"}
                         </Button>
                     )}
+                    <Button variant="outlined"
+                sx={{ mt: 2, borderColor: "#2E3B4E", color: "#2E3B4E" }}
+                    onClick={handleDownloadPDF}
+                    >
+                    Download PDF
+                    </Button>
 
                     {returnMessage && <Typography sx={{ mt: 2, color: "green" }}>{returnMessage}</Typography>}
 
