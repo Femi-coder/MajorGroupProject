@@ -61,7 +61,7 @@ function TransactionContent() {
             return;
         }
 
-        fetch(`http://127.0.0.1:5000/api/transactions/${transactionId}`)
+        fetch(`https://flask-api1-1-j42x.onrender.com/api/transactions/${transactionId}`)
             .then((res) => res.json())
             .then((data) => {
                 if (data.error) {
