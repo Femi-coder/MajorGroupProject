@@ -50,5 +50,3 @@ app.get("/api/directions", async (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-//npm install express axios cors dotenv

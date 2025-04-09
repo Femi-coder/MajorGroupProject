@@ -7,6 +7,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import FrontendMapComponent from '../api/MapAPI/FrontendMapComponent';
 
 
 
@@ -188,6 +189,7 @@ function TransactionContent() {
                     >
                         RETURN TO HOME
                     </Button>
+                    <FrontendMapComponent />
                 </>
             ) : (
                 <Typography variant="h6" sx={{ color: "red" }}>

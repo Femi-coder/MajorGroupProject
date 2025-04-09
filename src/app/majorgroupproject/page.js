@@ -281,7 +281,7 @@ export default function MyApp() {
     
     
     useEffect(() => {
-        axios.get("http://127.0.0.1:5000/api/reviews")
+        axios.get("https://flask-api2-pifn.onrender.com/api/reviews")
             .then(response => setReviews(response.data))
             .catch(error => console.error("Error fetching reviews:", error));
     }, []);
@@ -294,7 +294,7 @@ const handleChange = (e) => {
 const handleSubmit = (e) => {
     e.preventDefault();
 
-    fetch("http://127.0.0.1:5000/api/reviews", {
+    fetch("https://flask-api2-pifn.onrender.com/api/reviews", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
