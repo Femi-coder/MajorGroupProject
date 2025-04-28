@@ -62,7 +62,7 @@ const FrontendMapComponent = () => {
   return (
     <div style={{ marginTop: "40px" }}>
       <h2 style={{ textAlign: "center", marginBottom: "10px", color: "#2E3B4E" }}>
-        🗺️ Fuel & EV Charging Stations in Dublin
+        Fuel & EV Charging Stations in Dublin
       </h2>
       <div
         ref={mapContainerRef}
