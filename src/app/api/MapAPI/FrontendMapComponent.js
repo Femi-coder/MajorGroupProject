@@ -6,6 +6,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 
 const MAPTILER_KEY = 'YdhCgymMzcLpTLfhEbpH'; //maptiler key
 
+//testing vercel 
 // Dublin City Center Coordinates
 const DUBLIN_COORDINATES = [-6.2603, 53.3498];
 
