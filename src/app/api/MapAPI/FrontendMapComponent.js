@@ -17,14 +17,14 @@ const FrontendMapComponent = () => {
     // Initialize the map centered on Dublin
     mapRef.current = new maplibregl.Map({
       container: mapContainerRef.current,
-      style: `https://api.maptiler.com/maps/streets/style.json?key=${MAPTILER_KEY}`,
+      style: `https://api.maptiler.com/maps/streets/style.json?key=${MAPTILER_KEY}`,//test
       center: DUBLIN_COORDINATES,
       zoom: 12,
     });
 
     mapRef.current.addControl(new maplibregl.NavigationControl(), 'top-right');
 
-    // Add a green marker for Dublin city center (optional)
+    // Add a green marker for Dublin city center
     new maplibregl.Marker({ color: 'green' })
       .setLngLat(DUBLIN_COORDINATES)
       .setPopup(new maplibregl.Popup().setText('Dublin City Center'))
