@@ -4,7 +4,7 @@ import maplibregl from 'maplibre-gl';
 import axios from 'axios';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
-const MAPTILER_KEY = 'YdhCgymMzcLpTLfhEbpH';
+const MAPTILER_KEY = 'YdhCgymMzcLpTLfhEbpH'; //maptiler key
 
 // Dublin City Center Coordinates
 const DUBLIN_COORDINATES = [-6.2603, 53.3498];
