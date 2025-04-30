@@ -29,7 +29,7 @@ def process_transaction():
         user_email = data.get("user_email")  #  Fetch user email from request
         user_name = data.get("user_name") 
         vehicle_id = data.get("vehicle_id")
-        amount = float(data.get("amount"))  # Ensure amount is a float
+        daily_rate = float(data.get("amount"))
         pickup = data.get("pickup")
         dropoff = data.get("dropoff")
         start = data.get("start")
@@ -38,11 +38,17 @@ def process_transaction():
         if not user_email or not user_name or not vehicle_id or not pickup or not dropoff or not start or not end:
             return jsonify({"error": "Missing required transaction details"}), 400
 
+        #To calculate the total price
+        start_date = datetime.strptime(start, "%Y-%m-%d")
+        end_date = datetime.strptime(end, "%Y-%m-%d")
+        days_rented = max(1, (end_date - start_date).days + 1)
+
+        total_amount = daily_rate * days_rented
         #  Check if user is a Student Share member
         student_share_user = studentshare_collection.find_one({"email": user_email})
         if student_share_user:
-            amount *= 0.85  # This Applies a 15% discount for Student Share members
-            amount = round(amount, 2)  #  Round to 2 decimal places for consistency
+            total_amount *= 0.85  # This Applies a 15% discount for Student Share members
+            total_amount = round(total_amount, 2)  #  Round to 2 decimal places for consistency
 
         #  Fetch vehicle name from MongoDB
         vehicle = vehicles_collection.find_one({"carId": int(vehicle_id)})
@@ -61,7 +67,9 @@ def process_transaction():
             "user_name": user_name,
             "vehicle_id": vehicle_id,
             "vehicle_name": vehicle_name,
-            "amount": amount,  #  Store correct (discounted) amount
+            "daily_rate" : daily_rate,
+            "days_rented" : days_rented,
+            "amount": total_amount,  #  Store correct (discounted) amount
             "pickup": pickup,
             "dropoff": dropoff,
             "start": start,
@@ -76,7 +84,9 @@ def process_transaction():
         return jsonify({
             "status": "success",
             "transaction_id": transaction_id,
-            "final_price": amount,  #  Send discounted price in response
+            "daily_rate": daily_rate,
+            "days_rented": days_rented,
+            "amount": total_amount,
             "message": "Transaction created successfully"
         }), 201
 

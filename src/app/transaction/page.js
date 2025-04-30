@@ -7,7 +7,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import FrontendMapComponent from "../api/MapAPI/FrontendMapComponent";
+import FrontendMapComponent from "../api/mapapi/FrontendMapComponent";
 
 
 
@@ -38,7 +38,9 @@ function TransactionContent() {
         const tableData = [
             ["Name", userName],
             ["Vehicle", vehicleName],
-            ["Price", `$${finalPrice || price}`],
+            ["Daily Price", `$${transaction?.daily_rate}`],
+            ["Days Rented", `${transaction?.days_rented}`],
+            ["Total Price", `$${transaction?.amount}`],
             ["Pickup", pickup],
             ["Dropoff", dropoff],
             ["Start Date", start],
@@ -83,8 +85,8 @@ function TransactionContent() {
         const isStudentShare = localStorage.getItem("student_share_registered") === "true";
 
         if (isStudentShare) {
-            const discountedPrice = (parseFloat(price) * 0.85).toFixed(2);
-            setFinalPrice(discountedPrice);
+            const discounted = (parseFloat(price) * 0.85).toFixed(2);
+            setFinalPrice(discounted);
         } else {
             setFinalPrice(price);
         }
@@ -125,37 +127,27 @@ function TransactionContent() {
 
             {transaction ? (
                 <>
+                    <Typography variant="h6"><strong>Hello, {userName}!</strong></Typography>
+                    <Typography variant="h6"><strong>Vehicle:</strong> {vehicleName}</Typography>
+                    <Typography variant="h6"><strong>Daily Price:</strong> ${transaction.daily_rate}</Typography>
+                    <Typography variant="h6"><strong>Days Rented:</strong> {transaction.days_rented}</Typography>
                     <Typography variant="h6">
-                        <strong>Hello, {userName}!</strong>
-                    </Typography>
-                    <Typography variant="h6">
-                        <strong>Vehicle:</strong> {vehicleName}
-                    </Typography>
-                    <Typography variant="h6">
-                        <strong>Price:</strong> 
+                        <strong>Total Price:</strong>{" "}
                         {localStorage.getItem("student_share_registered") === "true" ? (
                             <>
                                 <span style={{ textDecoration: "line-through", color: "red", marginRight: "8px" }}>
-                                    ${price}
+                                    ${(transaction.daily_rate * transaction.days_rented).toFixed(2)}
                                 </span>
-                                <span> ${finalPrice || price}</span>
+                                <span> ${transaction.amount}</span>
                             </>
                         ) : (
-                            `$${finalPrice || price}`
+                            `$${transaction.amount}`
                         )}
                     </Typography>
-                    <Typography variant="h6">
-                        <strong>Pickup:</strong> {pickup}
-                    </Typography>
-                    <Typography variant="h6">
-                        <strong>Dropoff:</strong> {dropoff}
-                    </Typography>
-                    <Typography variant="h6">
-                        <strong>Rental Start:</strong> {start}
-                    </Typography>
-                    <Typography variant="h6">
-                        <strong>Rental End:</strong> {end}
-                    </Typography>
+                    <Typography variant="h6"><strong>Pickup:</strong> {pickup}</Typography>
+                    <Typography variant="h6"><strong>Dropoff:</strong> {dropoff}</Typography>
+                    <Typography variant="h6"><strong>Rental Start:</strong> {start}</Typography>
+                    <Typography variant="h6"><strong>Rental End:</strong> {end}</Typography>
                     {transaction.status === "active" && (
                         <Button
                             variant="contained"
