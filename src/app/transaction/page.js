@@ -7,7 +7,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import FrontendMapComponent from "../api/mapapi/FrontendMapComponent";
+import FrontendMapComponent from "../api/map/FrontendMapComponent";
 
 function TransactionContent() {
   const searchParams = useSearchParams();
