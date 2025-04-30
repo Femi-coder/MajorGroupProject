@@ -9,193 +9,175 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import FrontendMapComponent from "../api/mapapi/FrontendMapComponent";
 
-
-
 function TransactionContent() {
-    const searchParams = useSearchParams();
-    const [transaction, setTransaction] = useState(null);
-    const [transactionStatus, setTransactionStatus] = useState("Loading...");
-    const [returnMessage, setReturnMessage] = useState("");
-    const [isReturning, setIsReturning] = useState(false);
-    const [finalPrice, setFinalPrice] = useState(null);
+  const searchParams = useSearchParams();
+  const [transactionStatus, setTransactionStatus] = useState("Loading...");
+  const [returnMessage, setReturnMessage] = useState("");
+  const [isReturning, setIsReturning] = useState(false);
+  const [daysRented, setDaysRented] = useState(null);
+  const [finalPrice, setFinalPrice] = useState(null);
+  const [isStudentShare, setIsStudentShare] = useState(false);
 
-    // Get data from URL parameters
-    const transactionId = searchParams.get("transactionId");
-    const userName = searchParams.get("userName") || "Guest";  
-    const vehicleName = searchParams.get("vehicleName") || "N/A";  
-    const price = searchParams.get("price") || "N/A";
-    const pickup = searchParams.get("pickup") || "N/A";
-    const dropoff = searchParams.get("dropoff") || "N/A";
-    const start = searchParams.get("start") || "N/A";
-    const end = searchParams.get("end") || "N/A";
+  const transactionId = searchParams.get("transactionId");
+  const userName = searchParams.get("userName") || "Guest";
+  const vehicleName = searchParams.get("vehicleName") || "N/A";
+  const price = parseFloat(searchParams.get("price")) || 0;
+  const pickup = searchParams.get("pickup") || "N/A";
+  const dropoff = searchParams.get("dropoff") || "N/A";
+  const start = searchParams.get("start") || "N/A";
+  const end = searchParams.get("end") || "N/A";
 
-    const handleDownloadPDF = () => {
-        const doc = new jsPDF();
-    
-        doc.setFontSize(18);
-        doc.text("Eco Wheels Dublin - Transaction Summary", 14, 22);
-    
-        const tableData = [
-            ["Name", userName],
-            ["Vehicle", vehicleName],
-            ["Daily Price", `$${transaction?.daily_rate}`],
-            ["Days Rented", `${transaction?.days_rented}`],
-            ["Total Price", `$${transaction?.amount}`],
-            ["Pickup", pickup],
-            ["Dropoff", dropoff],
-            ["Start Date", start],
-            ["End Date", end],
-            ["Transaction ID", transactionId],
-        ];
-    
-        autoTable(doc,{
-            startY: 30,
-            head: [["Field", "Value"]],
-            body: tableData
-        });
-    
-        doc.save(`EcoWheels_Transaction_${transactionId}.pdf`);
-    };
-    
+  useEffect(() => {
+    // Calculate days rented and apply discount
+    const isStudent = localStorage.getItem("student_share_registered") === "true";
+    setIsStudentShare(isStudent);
 
-    useEffect(() => {
-        if (!transactionId) {
-            setTransactionStatus("Invalid transaction ID.");
-            return;
-        }
+    if (start !== "N/A" && end !== "N/A") {
+      const startDate = new Date(start);
+      const endDate = new Date(end);
+      const days = Math.max(1, (endDate - startDate) / (1000 * 60 * 60 * 24));
 
-        fetch(`https://flask-api1-1-j42x.onrender.com/api/transactions/${transactionId}`)
-            .then((res) => res.json())
-            .then((data) => {
-                if (data.error) {
-                    setTransactionStatus(`Transaction not found: ${data.error}`);
-                } else {
-                    setTransaction(data.transaction);
-                }
-            })
-            .catch((error) => {
-                setTransactionStatus(`Error fetching transaction: ${error.message}`);
-            });
-    }, [transactionId]);
+      setDaysRented(days);
 
-    // Apply Student Share discount if applicable
-    useEffect(() => {
-        if (!price || price === "N/A") return; // Prevents running if price isn't set
+      const total = price * days;
+      const discounted = isStudent ? (total * 0.85).toFixed(2) : total.toFixed(2);
+      setFinalPrice(discounted);
+    }
+  }, [start, end, price]);
 
-        const isStudentShare = localStorage.getItem("student_share_registered") === "true";
+  const handleReturnCar = async () => {
+    setIsReturning(true);
 
-        if (isStudentShare) {
-            const discounted = (parseFloat(price) * 0.85).toFixed(2);
-            setFinalPrice(discounted);
-        } else {
-            setFinalPrice(price);
-        }
-    }, [price]);
+    try {
+      const response = await fetch("http://127.0.0.1:5000/api/return-car", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transaction_id: transactionId }),
+      });
 
-    const handleReturnCar = async () => {
-        setIsReturning(true);
+      const data = await response.json();
+      if (response.ok) {
+        setReturnMessage(`Success: ${data.message} ${data.late_fee ? `Late Fee: €${data.late_fee}` : ""}`);
+      } else {
+        setReturnMessage(`Error: ${data.error}`);
+      }
+    } catch (error) {
+      setReturnMessage("Server error. Please try again.");
+    }
 
-        try {
-            const response = await fetch("http://127.0.0.1:5000/api/return-car", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ transaction_id: transactionId }),
-            });
+    setIsReturning(false);
+  };
 
-            const data = await response.json();
+  const handleDownloadPDF = () => {
+    const doc = new jsPDF();
 
-            if (response.ok) {
-                setReturnMessage(` Success: ${data.message} ${data.late_fee ? `Late Fee: €${data.late_fee}` : ""}`);
-                setTransaction({ ...transaction, status: "returned" }); // Update UI
-            } else {
-                setReturnMessage(` Error: ${data.error}`);
-            }
-        } catch (error) {
-            setReturnMessage(" Server error. Please try again.");
-        }
+    doc.setFontSize(18);
+    doc.text("Eco Wheels Dublin - Transaction Summary", 14, 22);
 
-        setIsReturning(false);
-    };
+    const tableData = [
+      ["Name", userName],
+      ["Vehicle", vehicleName],
+      ["Price per Day", isStudentShare ? `$${(price * 0.85).toFixed(2)} (Discounted)` : `$${price.toFixed(2)}`],
+      ["Days Rented", daysRented || "N/A"],
+      ["Total Price", `$${finalPrice || "N/A"}`],
+      ["Pickup", pickup],
+      ["Dropoff", dropoff],
+      ["Start Date", start],
+      ["End Date", end],
+      ["Transaction ID", transactionId],
+    ];
 
-    return (
-        <Box sx={{ textAlign: "center", mt: 5 }}>
-            <Typography variant="h3" sx={{ fontWeight: "bold", mb: 2 }}>
-                Transaction Summary
-            </Typography>
+    autoTable(doc, {
+      startY: 30,
+      head: [["Field", "Value"]],
+      body: tableData,
+    });
 
-            {transaction ? (
-                <>
-                    <Typography variant="h6"><strong>Hello, {userName}!</strong></Typography>
-                    <Typography variant="h6"><strong>Vehicle:</strong> {vehicleName}</Typography>
-                    <Typography variant="h6"><strong>Daily Price:</strong> ${transaction.daily_rate}</Typography>
-                    <Typography variant="h6"><strong>Days Rented:</strong> {transaction.days_rented}</Typography>
-                    <Typography variant="h6">
-                        <strong>Total Price:</strong>{" "}
-                        {localStorage.getItem("student_share_registered") === "true" ? (
-                            <>
-                                <span style={{ textDecoration: "line-through", color: "red", marginRight: "8px" }}>
-                                    ${(transaction.daily_rate * transaction.days_rented).toFixed(2)}
-                                </span>
-                                <span> ${transaction.amount}</span>
-                            </>
-                        ) : (
-                            `$${transaction.amount}`
-                        )}
-                    </Typography>
-                    <Typography variant="h6"><strong>Pickup:</strong> {pickup}</Typography>
-                    <Typography variant="h6"><strong>Dropoff:</strong> {dropoff}</Typography>
-                    <Typography variant="h6"><strong>Rental Start:</strong> {start}</Typography>
-                    <Typography variant="h6"><strong>Rental End:</strong> {end}</Typography>
-                    {transaction.status === "active" && (
-                        <Button
-                            variant="contained"
-                            onClick={handleReturnCar}
-                            disabled={isReturning}
-                            sx={{ mt: 3, backgroundColor: "red", color: "white" }}
-                        >
-                            {isReturning ? "Processing..." : "Return Car"}
-                        </Button>
-                    )}
-                    <Button variant="outlined"
-                sx={{ mt: 2, borderColor: "#2E3B4E", color: "#2E3B4E" }}
-                    onClick={handleDownloadPDF}
-                    >
-                    Download PDF
-                    </Button>
+    doc.save(`EcoWheels_Transaction_${transactionId}.pdf`);
+  };
 
-                    {returnMessage && <Typography sx={{ mt: 2, color: "green" }}>{returnMessage}</Typography>}
+  return (
+    <Box sx={{ textAlign: "center", mt: 5 }}>
+      <Typography variant="h3" sx={{ fontWeight: "bold", mb: 2 }}>
+        Transaction Summary
+      </Typography>
 
-                    <Button
-                        variant="contained"
-                        sx={{
-                            mt: 3,
-                            backgroundColor: "#2E3B4E",
-                            color: "white",
-                            ":hover": {
-                                backgroundColor: "#4C5E72",
-                            },
-                        }}
-                        onClick={() => window.location.href = "/"}
-                    >
-                        RETURN TO HOME
-                    </Button>
-                    <FrontendMapComponent />
-                </>
+      {transactionId ? (
+        <>
+          <Typography variant="h6"><strong>Hello, {userName}!</strong></Typography>
+          <Typography variant="h6"><strong>Vehicle:</strong> {vehicleName}</Typography>
+
+          <Typography variant="h6">
+            <strong>Price per day:</strong>{" "}
+            {isStudentShare ? (
+              <>
+                <span style={{ textDecoration: "line-through", color: "red", marginRight: "8px" }}>${price.toFixed(2)}</span>
+                <span>${(price * 0.85).toFixed(2)}</span>
+              </>
             ) : (
-                <Typography variant="h6" sx={{ color: "red" }}>
-                    {transactionStatus}
-                </Typography>
+              `$${price.toFixed(2)}`
             )}
-        </Box>
-    );
+          </Typography>
+
+          <Typography variant="h6">
+            <strong>Days Rented:</strong> {daysRented ?? "N/A"}
+          </Typography>
+
+          <Typography variant="h6">
+            <strong>Total Price:</strong>{" "}
+            {isStudentShare && finalPrice ? (
+              <>
+                <span style={{ textDecoration: "line-through", color: "red", marginRight: "8px" }}>
+                  ${(price * daysRented).toFixed(2)}
+                </span>
+                <span>${finalPrice}</span>
+              </>
+            ) : (
+              `$${finalPrice ?? "N/A"}`
+            )}
+          </Typography>
+
+          <Typography variant="h6"><strong>Pickup:</strong> {pickup}</Typography>
+          <Typography variant="h6"><strong>Dropoff:</strong> {dropoff}</Typography>
+          <Typography variant="h6"><strong>Rental Start:</strong> {start}</Typography>
+          <Typography variant="h6"><strong>Rental End:</strong> {end}</Typography>
+
+          <Button
+            variant="contained"
+            onClick={handleReturnCar}
+            disabled={isReturning}
+            sx={{ mt: 3, backgroundColor: "red", color: "white" }}
+          >
+            {isReturning ? "Processing..." : "Return Car"}
+          </Button>
+
+          <Button variant="outlined" sx={{ mt: 2, borderColor: "#2E3B4E", color: "#2E3B4E" }} onClick={handleDownloadPDF}>
+            Download PDF
+          </Button>
+
+          {returnMessage && <Typography sx={{ mt: 2, color: "green" }}>{returnMessage}</Typography>}
+
+          <Button
+            variant="contained"
+            sx={{ mt: 3, backgroundColor: "#2E3B4E", color: "white", ":hover": { backgroundColor: "#4C5E72" } }}
+            onClick={() => window.location.href = "/"}
+          >
+            RETURN TO HOME
+          </Button>
+
+          <FrontendMapComponent />
+        </>
+      ) : (
+        <Typography variant="h6" sx={{ color: "red" }}>{transactionStatus}</Typography>
+      )}
+    </Box>
+  );
 }
 
 export default function TransactionPage() {
-    return (
-        <Suspense fallback={<Typography variant="h6">Loading...</Typography>}>
-            <TransactionContent />
-        </Suspense>
-    );
+  return (
+    <Suspense fallback={<Typography variant="h6">Loading...</Typography>}>
+      <TransactionContent />
+    </Suspense>
+  );
 }
