@@ -47,6 +47,8 @@ export default function MyApp() {
     const [vehicles, setVehicles] = useState([]);
     const [showAdminPage, setShowAdminPage] = useState(false);
     const [adminLoggedIn, setAdminLoggedIn] = useState(false);
+    const [transactions, setTransactions] = useState([]);
+
 
     useEffect(() => {
         const storedEmail = localStorage.getItem("user_email");
@@ -60,19 +62,22 @@ export default function MyApp() {
             if (isStudentShare) {
                 setStudentShareLoggedIn(true);
                 setStudentShareRegistered(true);
-                setLoggedIn(false); // Ensure normal login state is false for Student Share users
+                setLoggedIn(false); 
             } else {
                 setLoggedIn(true);
                 setStudentShareLoggedIn(false);
-                setStudentShareRegistered(false); // Ensure Student Share state is false for normal users
+                setStudentShareRegistered(false);
             }
         }
     }, []);
     useEffect(() => {
         if (showAdminPage) {
             fetchAdminVehicles();
+            axios.get("https://flask-api1-1-j42x.onrender.com/api/transactions")
+                .then(response => setTransactions(response.data))
+                .catch(error => console.error("Error fetching transactions:", error));
         }
-    }, [showAdminPage]);
+    }, [showAdminPage]);    
 
     useEffect(() => {
         // Check if admin is already logged in
@@ -135,6 +140,8 @@ export default function MyApp() {
         setShowReviews(true);
     };
 
+    
+
     const fetchAdminVehicles = async () => {
         try {
             const response = await fetch("/api/admin");
@@ -159,7 +166,15 @@ export default function MyApp() {
             setVehicles([]); // Ensure it remains an array
         }
     };
-    
+    const fetchTransactions = async () => {
+        try {
+          const response = await fetch("https://flask-api1-1-j42x.onrender.com/api/transactions");
+          const data = await response.json();
+          setTransactions(data);
+        } catch (error) {
+          console.error("Error fetching transactions:", error);
+        }
+      };
     
     
 
@@ -622,7 +637,7 @@ const handleStudentShareLogin = () => {
     sx={{
         position: 'relative',
         width: '100vw',
-        minHeight: '100vh', // Ensure full height
+        minHeight: '100%',
         backgroundColor: '#2E3B4E',
         color: 'lightgreen',
         overflowY: 'auto', // Enables vertical scrolling
@@ -1376,11 +1391,46 @@ const handleStudentShareLogin = () => {
                 </TableBody>
             </Table>
         </TableContainer>
+        <Box sx={{ mt: 6 }}>
+      <Typography variant="h4" sx={{ fontWeight: "bold", mb: 3 }}>
+        All Transactions
+      </Typography>
+
+      <TableContainer component={Paper} sx={{ maxWidth: "1100px", margin: "auto" }}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell><strong>User</strong></TableCell>
+              <TableCell><strong>Email</strong></TableCell>
+              <TableCell><strong>Vehicle</strong></TableCell>
+              <TableCell><strong>Price</strong></TableCell>
+              <TableCell><strong>Pickup</strong></TableCell>
+              <TableCell><strong>Dropoff</strong></TableCell>
+              <TableCell><strong>Start</strong></TableCell>
+              <TableCell><strong>End</strong></TableCell>
+              <TableCell><strong>Transaction ID</strong></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {transactions.map((t, index) => (
+              <TableRow key={index}>
+                <TableCell>{t.user_name}</TableCell>
+                <TableCell>{t.user_email}</TableCell>
+                <TableCell>{t.vehicle_name}</TableCell>
+                <TableCell>${t.amount}</TableCell>
+                <TableCell>{t.pickup}</TableCell>
+                <TableCell>{t.dropoff}</TableCell>
+                <TableCell>{t.start}</TableCell>
+                <TableCell>{t.end}</TableCell>
+                <TableCell>{t.transaction_id}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </Box>
+  </Box>
 )}
-
-
-
 
 
 {showVehicles && <VehicleList username={username} runShowRent={runShowRent} />}
