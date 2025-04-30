@@ -50,6 +50,7 @@ export default function MyApp() {
     const [transactions, setTransactions] = useState([]);
 
 
+
     useEffect(() => {
         const storedEmail = localStorage.getItem("user_email");
         const storedUsername = localStorage.getItem("username");
@@ -66,18 +67,21 @@ export default function MyApp() {
             } else {
                 setLoggedIn(true);
                 setStudentShareLoggedIn(false);
-                setStudentShareRegistered(false);
+                setStudentShareRegistered(false); 
             }
         }
     }, []);
     useEffect(() => {
         if (showAdminPage) {
             fetchAdminVehicles();
-            axios.get("https://flask-api1-1-j42x.onrender.com/api/transactions")
-                .then(response => setTransactions(response.data))
-                .catch(error => console.error("Error fetching transactions:", error));
         }
-    }, [showAdminPage]);    
+    }, [showAdminPage]);
+
+    useEffect(() => {
+        if (adminLoggedIn && showAdminPage) {
+          fetchAdminTransactions();
+        }
+      }, [adminLoggedIn, showAdminPage]);
 
     useEffect(() => {
         // Check if admin is already logged in
@@ -163,16 +167,16 @@ export default function MyApp() {
             }
         } catch (error) {
             console.error("Error fetching vehicles:", error);
-            setVehicles([]); // Ensure it remains an array
+            setVehicles([]); 
         }
     };
-    const fetchTransactions = async () => {
+    const fetchAdminTransactions = async () => {
         try {
-          const response = await fetch("https://flask-api1-1-j42x.onrender.com/api/transactions");
-          const data = await response.json();
+          const res = await fetch("/api/adminTransactions");
+          const data = await res.json();
           setTransactions(data);
         } catch (error) {
-          console.error("Error fetching transactions:", error);
+          console.error("Failed to load admin transactions:", error);
         }
       };
     
@@ -1354,83 +1358,88 @@ const handleStudentShareLogin = () => {
     </Box>
 )}
 {adminLoggedIn && showAdminPage && (
-    <Box sx={{ p: 4, textAlign: "center", backgroundColor: "#f5f5f5" }}>
-        <Typography variant="h3" sx={{ fontWeight: "bold", mb: 4 }}>
-            Admin Dashboard - Manage Vehicles
-        </Typography>
+  <Box sx={{ p: 4, textAlign: "center", backgroundColor: "#f5f5f5" }}>
+    <Typography variant="h3" sx={{ fontWeight: "bold", mb: 4 }}>
+      Admin Dashboard - Manage Vehicles
+    </Typography>
 
-        <TableContainer component={Paper} sx={{ maxWidth: "900px", margin: "auto" }}>
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        <TableCell><strong>Vehicle</strong></TableCell>
-                        <TableCell><strong>Year</strong></TableCell>
-                        <TableCell><strong>Price ($/day)</strong></TableCell>
-                        <TableCell><strong>Availability</strong></TableCell>
-                        <TableCell><strong>Action</strong></TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {vehicles.map((vehicle) => (
-                        <TableRow key={vehicle.carId}>
-                            <TableCell>{vehicle.make} {vehicle.model}</TableCell>
-                            <TableCell>{vehicle.year}</TableCell>
-                            <TableCell>${vehicle.price}</TableCell>
-                            <TableCell>{vehicle.available ? "Available" : "Unavailable"}</TableCell>
-                            <TableCell>
-                                <Button 
-                                    variant="contained"
-                                    sx={{ backgroundColor: vehicle.available ? "red" : "green", color: "white" }}
-                                    onClick={() => toggleVehicleAvailability(vehicle.carId, vehicle.available)}
-                                >
-                                    {vehicle.available ? "Set Unavailable" : "Set Available"}
-                                </Button>
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </TableContainer>
-        <Box sx={{ mt: 6 }}>
-      <Typography variant="h4" sx={{ fontWeight: "bold", mb: 3 }}>
-        All Transactions
-      </Typography>
-
-      <TableContainer component={Paper} sx={{ maxWidth: "1100px", margin: "auto" }}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell><strong>User</strong></TableCell>
-              <TableCell><strong>Email</strong></TableCell>
-              <TableCell><strong>Vehicle</strong></TableCell>
-              <TableCell><strong>Price</strong></TableCell>
-              <TableCell><strong>Pickup</strong></TableCell>
-              <TableCell><strong>Dropoff</strong></TableCell>
-              <TableCell><strong>Start</strong></TableCell>
-              <TableCell><strong>End</strong></TableCell>
-              <TableCell><strong>Transaction ID</strong></TableCell>
+    {/* VEHICLES TABLE */}
+    <TableContainer component={Paper} sx={{ maxWidth: "900px", margin: "auto", mb: 6 }}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell><strong>Vehicle</strong></TableCell>
+            <TableCell><strong>Year</strong></TableCell>
+            <TableCell><strong>Price ($/day)</strong></TableCell>
+            <TableCell><strong>Availability</strong></TableCell>
+            <TableCell><strong>Action</strong></TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {vehicles.map((vehicle) => (
+            <TableRow key={vehicle.carId}>
+              <TableCell>{vehicle.make} {vehicle.model}</TableCell>
+              <TableCell>{vehicle.year}</TableCell>
+              <TableCell>${vehicle.price}</TableCell>
+              <TableCell>{vehicle.available ? "Available" : "Unavailable"}</TableCell>
+              <TableCell>
+                <Button
+                  variant="contained"
+                  sx={{ backgroundColor: vehicle.available ? "red" : "green", color: "white" }}
+                  onClick={() => toggleVehicleAvailability(vehicle.carId, vehicle.available)}
+                >
+                  {vehicle.available ? "Set Unavailable" : "Set Available"}
+                </Button>
+              </TableCell>
             </TableRow>
-          </TableHead>
-          <TableBody>
-            {transactions.map((t, index) => (
-              <TableRow key={index}>
-                <TableCell>{t.user_name}</TableCell>
-                <TableCell>{t.user_email}</TableCell>
-                <TableCell>{t.vehicle_name}</TableCell>
-                <TableCell>${t.amount}</TableCell>
-                <TableCell>{t.pickup}</TableCell>
-                <TableCell>{t.dropoff}</TableCell>
-                <TableCell>{t.start}</TableCell>
-                <TableCell>{t.end}</TableCell>
-                <TableCell>{t.transaction_id}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Box>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+
+    {/* TRANSACTIONS TABLE */}
+    <Typography variant="h4" sx={{ fontWeight: "bold", mb: 3 }}>
+      All Transactions
+    </Typography>
+
+    <TableContainer component={Paper} sx={{ maxWidth: "1100px", margin: "auto" }}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell><strong>User</strong></TableCell>
+            <TableCell><strong>Email</strong></TableCell>
+            <TableCell><strong>Vehicle</strong></TableCell>
+            <TableCell><strong>Price</strong></TableCell>
+            <TableCell><strong>Pickup</strong></TableCell>
+            <TableCell><strong>Dropoff</strong></TableCell>
+            <TableCell><strong>Start</strong></TableCell>
+            <TableCell><strong>End</strong></TableCell>
+            <TableCell><strong>Transaction ID</strong></TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {transactions.map((t, index) => (
+            <TableRow key={index}>
+              <TableCell>{t.user_name}</TableCell>
+              <TableCell>{t.user_email}</TableCell>
+              <TableCell>{t.vehicle_name}</TableCell>
+              <TableCell>${t.amount}</TableCell>
+              <TableCell>{t.pickup}</TableCell>
+              <TableCell>{t.dropoff}</TableCell>
+              <TableCell>{t.start}</TableCell>
+              <TableCell>{t.end}</TableCell>
+              <TableCell>{t.transaction_id}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
   </Box>
 )}
+
+
+
+
 
 
 {showVehicles && <VehicleList username={username} runShowRent={runShowRent} />}
