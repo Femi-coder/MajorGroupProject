@@ -1219,7 +1219,7 @@ const handleStudentShareLogin = () => {
                 gap: 2.5,
                 textAlign: 'left',
             }}
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
                 e.preventDefault();
                 const formData = new FormData(e.target);
                 const name = formData.get('name').trim();
@@ -1232,10 +1232,25 @@ const handleStudentShareLogin = () => {
                     alert('Please fill in all fields before submitting.');
                     return;
                 }
-
-                alert('Message sent successfully!');
-                e.target.reset();
-            }}
+                try {
+                    const res = await fetch('/api/contact', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ name, email, phone, subject, message }),
+                    });
+                
+                    const data = await res.json();
+                    if (res.ok) {
+                        alert('Message sent successfully!');
+                        e.target.reset();
+                      } else {
+                        alert(data.error || 'Something went wrong.');
+                      }
+                    } catch (err) {
+                      console.error('Submission error:', err);
+                      alert('An error occurred. Please try again.');
+                    }
+                  }}
         >
             <TextField label="Full Name" name="name" variant="outlined" required fullWidth />
             <TextField label="Email Address" name="email" type="email" variant="outlined" required fullWidth />
