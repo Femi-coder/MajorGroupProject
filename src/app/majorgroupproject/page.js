@@ -1,6 +1,4 @@
 'use client';
-
-import Link from 'next/link';
 import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -27,7 +25,6 @@ export default function MyApp() {
     const [showRegister, setShowRegister] = useState(false);
     const [showLogin, setShowLogin] = useState(false);
     const [showStudentShare, setShowStudentShare] = useState(false);
-    const [showMapApi, setShowMapApi] = useState(false);
     const [showReviews, setShowReviews] = useState(false);
     const [showRent, setShowRent] = useState(false);
     const [showContact, setShowContact] = useState(false);
@@ -93,15 +90,10 @@ export default function MyApp() {
     
 
     const resetPages = () => {
-    const runShowVehicles = () => {
-        resetPages();
-    };
-
         setShowFirstPage(false);
         setShowRegister(false);
         setShowLogin(false);
         setShowStudentShare(false);
-        setShowMapApi(false);
         setShowReviews(false);
         setShowRent(false);
         setShowContact(false);
@@ -127,16 +119,6 @@ export default function MyApp() {
     const runShowStudentShare = () => {
         resetPages();
         setShowStudentShare(true);
-    };
-
-    const runShowMapApi = () => {
-        if (!loggedIn) {
-            alert("You must be logged in to access the Map API.");
-            runShowLogin();
-            return;
-        }
-        resetPages();
-        setShowMapApi(true);
     };
 
     const runShowReviews = () => {
@@ -687,9 +669,6 @@ const handleStudentShareLogin = () => {
 <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={handleShowStudentShare}>
     Student Share
 </Button>
-<Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowMapApi}>
-    Map API
-</Button>
 <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowReviews}>
     Reviews
 </Button>
@@ -1098,17 +1077,6 @@ const handleStudentShareLogin = () => {
     </Box>
 )}
 
-
-
-
-
-
-            {showMapApi && (
-                <Box sx={{ p: 4, textAlign: 'center', backgroundColor: 'white', borderRadius: '10px' }}>
-                    <Typography variant="h3">Map API</Typography>
-                    <Typography>Page under construction</Typography>
-                </Box>
-            )}
 
 {showReviews && (
     <Box 
