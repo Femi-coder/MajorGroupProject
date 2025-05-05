@@ -13,13 +13,24 @@ export async function GET() {
         const db = client.db(DB_NAME);
         const vehiclesCollection = db.collection("vehicles");
 
-        //  Fetch only available vehicles
-        const availableVehicles = await vehiclesCollection.find({ available: true }).toArray();
+
+        await vehiclesCollection.updateMany(
+            {
+                available: false,
+                unavailableUntil: { $lte: new Date() }
+            },
+            {
+                $set: { available: true, unavailableUntil: null }
+            }
+        );
+
+        //  Fetch all vehicles not just available ones
+        const allVehicles = await vehiclesCollection.find({}).toArray();
 
         await client.close();
 
         //  Return JSON response
-        return new Response(JSON.stringify(availableVehicles), { status: 200 });
+        return new Response(JSON.stringify(allVehicles), { status: 200 });
     } catch (error) {
         console.error("Error fetching vehicles:", error);
         return new Response(JSON.stringify({ error: "Internal server error" }), { status: 500 });

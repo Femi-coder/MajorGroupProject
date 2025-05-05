@@ -139,12 +139,21 @@ const VehicleList = ({ username, runShowRent }) => {
                             </Typography>
 
                             <Button 
-                                variant="contained" 
-                                sx={{ mt: 2, width: "100%" }} 
-                                disabled={!vehicle.available}
-                            >
-                                {vehicle.available ? "Rent Now" : "Unavailable"}
-                            </Button>
+  variant="contained" 
+  sx={{ mt: 2, width: "100%" }} 
+  disabled={!vehicle.available}
+>
+{vehicle.available 
+    ? "Rent Now" 
+    : "Unavailable until further notice"
+  }
+</Button>
+{!vehicle.available && (
+  <Typography variant="body2" color="error">
+    Unavailable until further notice
+  </Typography>
+)}
+
                         </CardContent>
                     </Card>
                 ))}
