@@ -623,7 +623,7 @@ const handleStudentShareLogin = () => {
     sx={{
         position: 'relative',
         width: '100vw',
-        minHeight: '100%',
+        minHeight: '100vh',
         backgroundColor: '#2E3B4E',
         color: 'lightgreen',
         overflowY: 'auto', // Enables vertical scrolling
