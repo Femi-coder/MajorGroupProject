@@ -8,7 +8,7 @@ export async function POST(req) {
 
     try {
         const body = await req.json();
-        let { carId, end } = body;
+        let { carId } = body; 
 
         console.log("Received rental request for vehicle:", carId);
 
@@ -16,10 +16,6 @@ export async function POST(req) {
         if (isNaN(carId)) {
             console.error("Invalid vehicle ID format");
             return new Response(JSON.stringify({ error: "Invalid vehicle ID format" }), { status: 400 });
-        }
-
-        if (!end || isNaN(Date.parse(end))) {
-            return new Response(JSON.stringify({ error: "Invalid or missing end date" }), { status: 400 });
         }
 
         const client = new MongoClient(MONGO_URI);
@@ -34,16 +30,13 @@ export async function POST(req) {
             return new Response(JSON.stringify({ error: "Vehicle not found" }), { status: 404 });
         }
 
+        //  Check if vehicle is available
         if (!vehicle.available) {
             return new Response(JSON.stringify({ error: "Vehicle already rented" }), { status: 400 });
         }
 
-        // Update availability and set unavailableUntil
-        await vehiclesCollection.updateOne(
-            { carId: carId },
-            { $set: { available: false,} }
-        );
-
+        //  Mark the vehicle as unavailable
+        await vehiclesCollection.updateOne({ carId: carId }, { $set: { available: false } });
         await client.close();
 
         return new Response(JSON.stringify({ message: "Vehicle rented successfully!" }), { status: 200 });
