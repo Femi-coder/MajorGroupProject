@@ -45,7 +45,8 @@ export default function MyApp() {
     const [showAdminPage, setShowAdminPage] = useState(false);
     const [adminLoggedIn, setAdminLoggedIn] = useState(false);
     const [transactions, setTransactions] = useState([]);
-
+    const [userTransactions, setUserTransactions] = useState([]);
+    const [showMyTransactions, setShowMyTransactions] = useState(false);
 
 
     useEffect(() => {
@@ -208,7 +209,29 @@ export default function MyApp() {
         }
     };
 
-
+    const runShowMyTransactions = async () => {
+        resetPages();
+      
+        const email = localStorage.getItem("user_email");
+        if (!email) {
+          alert("You must be logged in to view transactions.");
+          return;
+        }
+      
+        try {
+          const res = await fetch(`/api/userTransactions?email=${encodeURIComponent(email)}`);
+          if (!res.ok) throw new Error("Fetch failed");
+      
+          const data = await res.json();
+          setUserTransactions(data);
+          setShowMyTransactions(true);
+      
+        } catch (err) {
+          console.error("Error:", err);
+          alert("Failed to load your transactions.");
+        }
+      };
+      
 
 
 
@@ -681,6 +704,10 @@ export default function MyApp() {
                     <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowVehicles}>
                         Vehicles
                     </Button>
+                    <Button color="inherit" sx={{ fontWeight: 'bold' }} onClick={runShowMyTransactions}>
+                        My Transactions
+                        </Button>
+
                     {/*  Shows Admin Login button when NOT logged in */}
                     {!adminLoggedIn && (
                         <Button color="inherit" sx={{ fontWeight: 'bold' }}
@@ -1340,6 +1367,47 @@ export default function MyApp() {
                     </Box>
                 </Box>
             )}
+            {showMyTransactions && (
+  <Box sx={{ p: 4, backgroundColor: "#fff", textAlign: "center" }}>
+    <Typography variant="h3" sx={{ fontWeight: "bold", mb: 3 }}>
+      My Transactions
+    </Typography>
+
+    {userTransactions.length === 0 ? (
+      <Typography>No transactions found.</Typography>
+    ) : (
+      <TableContainer component={Paper} sx={{ maxWidth: "1100px", margin: "auto" }}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell><strong>Vehicle</strong></TableCell>
+              <TableCell><strong>Amount</strong></TableCell>
+              <TableCell><strong>Pickup</strong></TableCell>
+              <TableCell><strong>Dropoff</strong></TableCell>
+              <TableCell><strong>Start</strong></TableCell>
+              <TableCell><strong>End</strong></TableCell>
+              <TableCell><strong>Transaction ID</strong></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {userTransactions.map((t, i) => (
+              <TableRow key={i}>
+                <TableCell>{t.vehicle_name}</TableCell>
+                <TableCell>${t.amount}</TableCell>
+                <TableCell>{t.pickup}</TableCell>
+                <TableCell>{t.dropoff}</TableCell>
+                <TableCell>{t.start}</TableCell>
+                <TableCell>{t.end}</TableCell>
+                <TableCell>{t.transaction_id}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    )}
+  </Box>
+)}
+
             {adminLoggedIn && showAdminPage && (
                 <Box sx={{ p: 4, textAlign: "center", backgroundColor: "#f5f5f5" }}>
                     <Typography variant="h3" sx={{ fontWeight: "bold", mb: 4 }}>
