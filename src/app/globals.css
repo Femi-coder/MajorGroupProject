@@ -1,3 +1,9 @@
+/* 🌟 Add these Tailwind directives at the top */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Your custom variables and overrides */
 :root {
   --background: #ffffff;
   --foreground: #171717;
